@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+ <htmllang="it">
+ <head>
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <title>Lingue e Rune - Luce nell'Oscurità</title>
+     <script src="https://cdn.tailwindcss.com"></script>
+     <link rel="preconnect" href="https://fonts.googleapis.com">
+     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+     <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Spectral:wght@300;400;600&display=swap" rel="stylesheet">
+     <style>
+        :root {
+            --color-background: #080a13; 
+            --color-text-primary: #e0e5ec; 
+            --color-text-secondary: #b0bdc9; 
+            --color-accent-amber: #f59e0b; 
+            --color-accent-gold: #ffca28; 
+            --color-card-bg: rgba(23, 30, 46, 0.5); 
+            --color-card-border: rgba(251, 191, 36, 0.2); 
+            --color-shadow-amber: rgba(251, 191, 36, 0.35); 
+            --font-titles: 'Cinzel Decorative', cursive; 
+            --font-body: 'Spectral', serif; 
+        }
+
+        html {
+            scroll-behavior: smooth; 
+        }
+
+        body {
+            font-family: var(--font-body);
+            background-color: var(--color-background);
+            color: var(--color-text-primary);
+            overflow-x: hidden; 
+            position: relative;
+        }
+        
+        #starry-background {
+            position: fixed; 
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -10; 
+            overflow: hidden;
+            background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
+        }
+
+        .star {
+            position: absolute;
+            background-color: white;
+            border-radius: 50%;
+            animation: star-fall linear infinite; 
+            opacity: 0; 
+        }
+
+        @keyframes star-fall {
+            from { opacity: 0; transform: translateY(0) scale(0.5); }
+            to { opacity: 0; transform: translateY(100vh) scale(0.5); }
+            20%, 80% { opacity: 1; }
+        }
+        
+        .content-wrapper {
+            @apply container mx-auto py-16 md:py-24 px-4;
+        }
+
+        .hero-title {
+            font-family: var(--font-titles);
+            color: var(--color-accent-gold);
+            text-shadow: 0 0 10px var(--color-accent-gold), 0 0 25px var(--color-accent-amber), 0 0 50px var(--color-accent-amber);
+            opacity: 0;
+            animation: fadeInGlow 2s 0.5s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+        }
+
+        @keyframes fadeInGlow {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        .animated-item {
+            opacity: 0;
+            transform: translateY(40px);
+            animation: fadeInUp 1.2s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Ritardi animazioni */
+        .delay-1 { animation-delay: 0.8s; }
+        .delay-2 { animation-delay: 1.0s; }
+        .delay-3 { animation-delay: 1.2s; }
+        .delay-4 { animation-delay: 1.4s; }
+
+
+        .custom-card {
+            background-color: var(--color-card-bg);
+            @apply backdrop-blur-md p-6 md:p-8 rounded-2xl shadow-2xl transition-all duration-400 ease-out;
+            border: 1px solid var(--color-card-border);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+        }
+        
+        .custom-card:hover {
+            transform: translateY(-10px) scale(1.03); 
+            box-shadow: 0 0 40px var(--color-shadow-amber); 
+            border-color: rgba(251, 191, 36, 0.5); 
+        }
+
+        .card-title {
+            @apply text-3xl font-bold mb-4 text-center;
+            font-family: var(--font-titles); 
+            color: var(--color-accent-gold);
+            text-shadow: 0 0 5px var(--color-accent-amber);
+        }
+        .card-text {
+            @apply text-lg leading-relaxed;
+            color: var(--color-text-secondary);
+        }
+
+        .animated-image {
+            @apply rounded-lg shadow-2xl w-full h-auto;
+            border: 2px solid var(--color-card-border);
+            object-fit: contain;
+            max-height: 450px;
+        }
+
+        .runic-table-wrapper {
+            @apply w-full mt-8;
+        }
+        .runic-table {
+            @apply w-full text-base text-left text-gray-300 border-collapse;
+        }
+        .runic-table th, .runic-table td {
+            @apply px-4 py-4 border border-slate-700/80;
+             transition: background-color 0.3s ease;
+        }
+        .runic-table tbody tr:hover td {
+            background-color: rgba(251, 191, 36, 0.1);
+        }
+        .runic-table th {
+            @apply bg-slate-800/70 text-amber-300 font-semibold uppercase tracking-wider text-sm;
+        }
+        .runic-table .rune-symbol {
+            @apply text-2xl md:text-3xl text-amber-400 font-normal text-center;
+             font-family: 'Arial', sans-serif; 
+        }
+        .rune-category-titanic { @apply text-sky-300; } 
+        .rune-category-cardiale { @apply text-rose-300; }
+        .rune-category-neutro { @apply text-slate-300; }
+     </style>
+ </head>
+ <body class="antialiased">
+
+    <div id="starry-background"></div>
+
+    <main class="content-wrapper">
+        <section id="alfabeto-runico" class="space-y-16 md:space-y-24">
+           <header class="text-center">
+                <h1 class="hero-title text-6xl sm:text-7xl md:text-8xl lg:text-9xl">LINGUE E RUNE</h1>
+           </header>
+
+           <div class="max-w-4xl mx-auto text-center animated-item delay-1">
+               <img src="https://i.postimg.cc/xCDpq1hM/image.png" alt="[Immagine di Rappresentazione Artistica delle Rune Primordiali incise su pietra]" class="animated-image">
+               <p class="card-text text-lg italic mt-6">I sussurri dei Titani impressi nella trama stessa di Eron.</p>
+           </div>
+
+           <div class="custom-card max-w-4xl mx-auto animated-item delay-2">
+               <h3 class="card-title">◾ Forma e Utilizzo ◾</h3>
+               <p class="card-text text-center max-w-3xl mx-auto">L'alfabeto è composto da 28 glifi unici, ognuno corrispondente a un suono o concetto base. Alcuni simboli rappresentano forze titaniche, altri vibrazioni cardiali. Sono la lingua stessa della creazione, potente e pericolosa se usata impropriamente. Solo i "Dotati" e gli "Infrangi-legge" possono sperare di utilizzarle con una certa maestria, poiché incanalare il loro potere richiede un'immensa pratica e un profondo lavoro interiore. Un individuo comune che tentasse di manipolare attivamente le rune rischierebbe la follia o persino la morte.</p>
+           </div>
+           
+           <div class="custom-card max-w-5xl mx-auto animated-item delay-3">
+                <h3 class="card-title">Le Rune Primordiali</h3>
+                <div class="runic-table-wrapper overflow-x-auto">
+                    <table class="runic-table min-w-full">
+                       <thead>
+                           <tr>
+                               <th>Simbolo</th>
+                               <th>Nome fonetico</th>
+                               <th>Categoria</th>
+                               <th>Uso</th>
+                           </tr>
+                       </thead>
+                       <tbody>
+                           <tr><td class="rune-symbol">𐊊</td><td>Ghre</td><td class="rune-category-titanic">Titanic</td><td>Separazione, principio</td></tr>
+                           <tr><td class="rune-symbol">𐊍</td><td>Umn</td><td class="rune-category-titanic">Titanic</td><td>Pressione creativa</td></tr>
+                           <tr><td class="rune-symbol">𐊄</td><td>Lha’</td><td class="rune-category-titanic">Titanic</td><td>Instabilità, mutazione</td></tr>
+                           <tr><td class="rune-symbol">𐊓</td><td>Orr</td><td class="rune-category-titanic">Titanic</td><td>Cucitura tra piani</td></tr>
+                           <tr><td class="rune-symbol">𐊖</td><td>Vhō</td><td class="rune-category-titanic">Titanic</td><td>Forza in stasi</td></tr>
+                           <tr><td class="rune-symbol">𐊠</td><td>Zhar</td><td class="rune-category-titanic">Titanic</td><td>Trauma cosmico</td></tr>
+                           <tr><td class="rune-symbol">𐊆</td><td>Tzûn</td><td class="rune-category-titanic">Titanic</td><td>Spirale temporale</td></tr>
+                           <tr><td class="rune-symbol">𐋃</td><td>Yhre</td><td class="rune-category-cardiale">Cardiale</td><td>Desiderio cieco</td></tr>
+                           <tr><td class="rune-symbol">𐋁</td><td>Saal</td><td class="rune-category-cardiale">Cardiale</td><td>Dolore incantato</td></tr>
+                           <tr><td class="rune-symbol">𐋄</td><td>Koer</td><td class="rune-category-cardiale">Cardiale</td><td>Gioia neonata</td></tr>
+                           <tr><td class="rune-symbol">𐋆</td><td>Nirh</td><td class="rune-category-cardiale">Cardiale</td><td>Pensiero profondo</td></tr>
+                           <tr><td class="rune-symbol">𐋈</td><td>Vre</td><td class="rune-category-cardiale">Cardiale</td><td>Conflitto interiore</td></tr>
+                           <tr><td class="rune-symbol">𐋊</td><td>Tzar</td><td class="rune-category-cardiale">Cardiale</td><td>Unione emotiva</td></tr>
+                           <tr><td class="rune-symbol">𐋌</td><td>Drexh</td><td class="rune-category-cardiale">Cardiale</td><td>Sovraccarico d’anima</td></tr>
+                           <tr><td class="rune-symbol">𐊚</td><td>Khael</td><td class="rune-category-neutro">Neutro</td><td>Vuoto parlante</td></tr>
+                           <tr><td class="rune-symbol">𐊝</td><td>Ehnû</td><td class="rune-category-neutro">Neutro</td><td>Eco di silenzio</td></tr>
+                           <tr><td class="rune-symbol">𐊙</td><td>Qrûn</td><td class="rune-category-neutro">Neutro</td><td>Ricordo perduto</td></tr>
+                           <tr><td class="rune-symbol">𐊗</td><td>Ulz</td><td class="rune-category-neutro">Neutro</td><td>Canto senza suono</td></tr>
+                           <tr><td class="rune-symbol">𐋇</td><td>Thae</td><td class="rune-category-neutro">Neutro</td><td>Luce astratta</td></tr>
+                           <tr><td class="rune-symbol">𐊑</td><td>Mëor</td><td class="rune-category-neutro">Neutro</td><td>Densità interiore</td></tr>
+                           <tr><td class="rune-symbol">𐋎</td><td>Shûn</td><td class="rune-category-neutro">Neutro</td><td>Pulsazione nascosta</td></tr>
+                           <tr><td class="rune-symbol">𐋐</td><td>Zhohr</td><td class="rune-category-neutro">Neutro</td><td>Ruggito contenuto</td></tr>
+                           <tr><td class="rune-symbol">𐊃</td><td>Fhârn</td><td class="rune-category-neutro">Neutro</td><td>Lama vibrale</td></tr>
+                           <tr><td class="rune-symbol">𐋒</td><td>Yzzil</td><td class="rune-category-neutro">Neutro</td><td>Frammento d’essere</td></tr>
+                           <tr><td class="rune-symbol">𐋓</td><td>Rao’k</td><td class="rune-category-neutro">Neutro</td><td>Anello del non-fatto</td></tr>
+                           <tr><td class="rune-symbol">𐊬</td><td>Tuun</td><td class="rune-category-neutro">Neutro</td><td>Ripetizione pura</td></tr>
+                           <tr><td class="rune-symbol">𐋔</td><td>Kelûm</td><td class="rune-category-neutro">Neutro</td><td>Lentezza dell’origine</td></tr>
+                           <tr><td class="rune-symbol">𐋕</td><td>Orli</td><td class="rune-category-neutro">Neutro</td><td>Grido trattenuto</td></tr>
+                       </tbody>
+                   </table>
+                </div>
+           </div>
+
+           <div class="custom-card max-w-4xl mx-auto animated-item delay-4">
+               <h3 class="card-title">📜 Struttura del Linguaggio</h3>
+               <div class="text-lg text-center max-w-3xl mx-auto space-y-4">
+                   <p class="card-text">Ogni parola è una combinazione di 2–4 rune, pronunciate come un’unica vibrazione. Le rune non rappresentano lettere, ma interi stati cosmici o movimenti dell’essere. Alcune parole sono considerate sacre, e possono essere scritte solo su ossidiana vivente o vellum eterico (pelle del sogno).</p>
+               </div>
+               <div class="runic-table-wrapper overflow-x-auto mt-6">
+                    <h4 class="card-title text-2xl">Esempi di Parole</h4>
+                   <table class="runic-table min-w-full">
+                       <thead>
+                           <tr>
+                               <th>Parola</th>
+                               <th>Composizione Runica</th>
+                               <th>Significato</th>
+                           </tr>
+                       </thead>
+                       <tbody>
+                           <tr><td>Ghre-Lha’</td><td class="rune-symbol">𐊊𐊄</td><td>Frattura iniziale</td></tr>
+                           <tr><td>Tzûn-Yhre</td><td class="rune-symbol">𐊆𐋃</td><td>Chiamata dal vuoto emotivo</td></tr>
+                           <tr><td>Zhar-Tzar-Koer</td><td class="rune-symbol">𐊠𐋊𐋄</td><td>Creazione attraverso unione e gioia</td></tr>
+                           <tr><td>Umn-Drexh-Vre</td><td class="rune-symbol">𐊍𐋌𐋈</td><td>Forza che implode nella tempesta del cuore</td></tr>
+                       </tbody>
+                   </table>
+               </div>
+           </div>
+        </section>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Funzione per creare lo sfondo stellato
+            function createStarrySky(containerId, numStars) {
+                const sky = document.getElementById(containerId);
+                if (!sky) return;
+                for (let i = 0; i < numStars; i++) {
+                    const star = document.createElement('div');
+                    star.classList.add('star');
+                    const size = Math.random() * 2.5 + 0.5;
+                    star.style.width = `${size}px`;
+                    star.style.height = `${size}px`;
+                    star.style.top = `${Math.random() * 100}vh`;
+                    star.style.left = `${Math.random() * 100}vw`;
+                    const duration = Math.random() * 80 + 40;
+                    const delay = Math.random() * 20;
+                    star.style.animation = `star-fall ${duration}s linear ${delay}s infinite`;
+                    sky.appendChild(star);
+                }
+            }
+            createStarrySky('starry-background', 150);
+        });
+    </script>
+ </body>
+ </html>

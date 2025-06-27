@@ -1,0 +1,1103 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bestiario Fantastico di Anor - Tomo Arcano</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+    <style>
+        /* Impostazioni di base e sfondo */
+        body {
+            font-family: 'Lora', serif;
+            background-color: #000000; /* Sfondo nero profondo */
+            color: #d1d5db; /* Testo grigio chiaro */
+        }
+        
+        /* Stile per il canvas dello sfondo stellato */
+        #starfield {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1; /* Posiziona il canvas dietro a tutto */
+        }
+
+        /* Tipografia per i titoli */
+        .font-cinzel {
+            font-family: 'Cinzel Decorative', cursive;
+        }
+
+        /* Stile del titolo principale del bestiario */
+        .title-bestiary {
+            color: #f59e0b; /* Ambra/Oro */
+            text-shadow: 0 0 10px #f59e0b, 0 0 20px #f59e0b, 0 0 35px #d97706, 2px 2px 2px #000;
+        }
+
+        /* Stile per le schede delle creature */
+        .creature-entry {
+            background: linear-gradient(145deg, #1c1c1c, #0d0d0d); /* Sfumatura più scura su base nera */
+            border: 1px solid #3a3a3a; /* Bordo grigio scuro */
+            border-radius: 1rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.7), inset 0 0 15px rgba(0,0,0,0.6);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            overflow: hidden; 
+            position: relative;
+        }
+        
+        .creature-entry:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.8), 0 0 25px #f59e0b66;
+        }
+
+        /* Bagliore interno per le schede */
+        .creature-entry::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 1rem;
+            border: 2px solid transparent;
+            background: linear-gradient(to bottom right, #f59e0b, #92400e) border-box;
+            -webkit-mask: 
+                linear-gradient(#fff 0 0) padding-box, 
+                linear-gradient(#fff 0 0);
+            -webkit-mask-composite: destination-out;
+            mask-composite: exclude;
+            opacity: 0.3;
+            transition: opacity 0.3s ease;
+        }
+
+        .creature-entry:hover::before {
+            opacity: 0.8;
+        }
+
+        /* Nomi delle creature */
+        .creature-name {
+            color: #fbbf24; /* Giallo/Oro più luminoso */
+            border-bottom: 2px solid #ca8a04;
+            padding-bottom: 1rem;
+        }
+
+        /* Titoli delle sezioni interne */
+        .section-title {
+            font-family: 'Cinzel Decorative', cursive;
+            color: #e5e7eb; /* Grigio molto chiaro */
+            font-weight: 700;
+        }
+
+        /* Titoli delle sottosezioni (es. Forma Corrotta) */
+        .subsection-title {
+            color: #9ca3af; /* Grigio più tenue */
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            font-family: 'Lora', serif;
+            font-style: italic;
+            font-size: 1.1em;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        /* Icone per le sottosezioni */
+        .subsection-icon {
+            color: #f59e0b;
+            margin-right: 0.75rem;
+            font-size: 1.5em;
+            font-style: normal;
+            font-weight: bold;
+        }
+
+        /* Stile per le sezioni di nota/introduzione */
+        .note-section {
+            background-color: rgba(10, 10, 10, 0.85); /* Sfondo più scuro per le note */
+            border-left: 4px solid #f59e0b;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            backdrop-filter: blur(5px);
+        }
+
+        /* Immagini delle creature */
+        .creature-image {
+            width: 100%;
+            max-width: 300px;
+            height: 400px;
+            object-fit: cover;
+            border-radius: 0.75rem;
+            border: 3px solid #374151;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+        
+        .creature-entry:hover .creature-image {
+            transform: scale(1.05);
+            border-color: #ca8a04;
+        }
+        
+        /* Titoli di categoria */
+        .category-title {
+            font-family: 'Cinzel Decorative', cursive;
+            font-size: 2.8em;
+            color: #ca8a04;
+            text-align: center;
+            margin-top: 3rem;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid #ca8a04;
+            padding-bottom: 1rem;
+            letter-spacing: 2px;
+        }
+        
+        .category-note {
+            text-align: center;
+            font-style: italic;
+            color: #9ca3af;
+            margin-bottom: 2rem;
+            max-width: 80%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .quote-bestiary {
+            font-style: italic;
+            color: #d1d5db;
+            margin: 1rem 0;
+            padding: 1rem;
+            border-left: 3px solid #ca8a04;
+            background-color: rgba(0,0,0,0.2);
+            border-radius: 0 0.5rem 0.5rem 0;
+        }
+
+        /* Animazioni al caricamento */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in-section {
+            animation: fadeIn 0.8s ease-out forwards;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+    
+    <canvas id="starfield"></canvas>
+
+    <header class="text-center mb-16 relative z-10">
+        <h1 class="font-cinzel text-6xl md:text-8xl title-bestiary">Il Bestiario di Anor</h1>
+        <p class="text-xl text-amber-500 mt-4 tracking-wider">Cronache delle Creature d'Incanto e d'Ombra</p>
+    </header>
+
+    <main class="max-w-6xl mx-auto space-y-12 relative z-10">
+        
+        <section class="note-section fade-in-section">
+            <h2 class="font-cinzel text-3xl section-title mb-3 text-amber-400"><span class="mr-2">🌿</span>Nota sugli Animali Normali di Anor</h2>
+            <p class="text-gray-300 leading-relaxed text-justify">
+                Cervi, cavalli, volpi, orsi, lupi, falchi e molti altri animali abitano liberamente Anor. Non tutti subiscono la corruzione di Bane: solo quelli che vengono contaminati da zone maledette, battaglie oscure o rituali proibiti.
+            </p>
+        </section>
+
+        <section>
+            <h2 class="category-title">🦄 Cavalcature Nobili e Magiche 🐎</h2>
+        </section>
+
+        <article class="creature-entry p-6 md:p-8 relative">
+            <h2 class="font-cinzel text-4xl creature-name mb-6 text-center">🦅 Grifone Reale di Plumaris</h2>
+            <div class="grid md:grid-cols-5 gap-8">
+                <div class="md:col-span-2 flex justify-center items-start">
+                    <img src="https://i.postimg.cc/ZnVcNszS/image.png" alt="Immagine del Grifone Reale di Plumaris" class="creature-image" onerror="this.onerror=null; this.src='https://placehold.co/300x400/000000/FFFFFF?text=Errore+Immagine';">
+                </div>
+                <div class="md:col-span-3 space-y-4">
+                    <div>
+                        <h3 class="text-2xl section-title mb-2">Descrizione Arcana</h3>
+                        <p class="leading-relaxed">Corpo di leone, ali d’aquila dorate, maestoso e nobile.<br><strong>Tipo:</strong> Creatura magica</p>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl section-title mb-2">Comportamento e Habitat</h3>
+                        <p class="leading-relaxed"><strong>Comportamento:</strong> Si lega a cavalieri di cuore puro.<br><strong>Habitat:</strong> Vette di Plumaris.</p>
+                    </div>
+                    <div>
+                        <h3 class="subsection-title"><span class="subsection-icon"✝️</span>Forma Corrotta – Grifone Putrefatto</h3>
+                        <ul class="list-disc list-inside space-y-1 pl-4">
+                            <li>Piumaggio caduto, carne lacerata, ali ricucite con tendini.</li>
+                            <li>Urla umane nei suoi versi, vola solo di notte.</li>
+                            <li>Odia la luce e si nutre di speranza.</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="subsection-title"><span class="subsection-icon">?</span>Curiosità</h3>
+                        <ul class="list-disc list-inside space-y-1 pl-4">
+                           <li>Si narra che le piume dorate di un Grifone Reale, se donate spontaneamente, possano portare grande fortuna.</li>
+                           <li>Alcune leggende affermano che i Grifoni di Plumaris custodiscano antichi passaggi verso reami celestiali.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </article>
+
+        <article class="creature-entry p-6 md:p-8 relative">
+            <h2 class="font-cinzel text-4xl creature-name mb-6 text-center">🦄 Auralon, il Destriero Incorrotto</h2>
+            <div class="grid md:grid-cols-5 gap-8">
+                <div class="md:col-span-2 flex justify-center items-start">
+                    <img src="https://i.postimg.cc/LXGf9m2G/image.png" alt="Immagine di Auralon, il Destriero Incorrotto, un unicorno da guerra." class="creature-image" onerror="this.onerror=null; this.src='https://placehold.co/300x400/000000/FFFFFF?text=Errore+Immagine';">
+                </div>
+                <div class="md:col-span-3 space-y-4">
+                    <div>
+                        <h3 class="text-2xl section-title mb-2">Descrizione Arcana</h3>
+                        <p class="leading-relaxed">Muscoli scolpiti come marmo, criniera d’argento, corno d’oro vivo. La sua armatura non lo protegge: lo onora. Dove galoppa, la terra fiorisce. Gli zoccoli suonano come campane di giustizia.<br><strong>Tipo:</strong> Unicorno da Guerra – Sacro, Comune (in società civilizzate)</p>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl section-title mb-2">Comportamento e Habitat</h3>
+                        <p class="leading-relaxed"><strong>Comportamento:</strong> Fedele solo a chi combatte per proteggere. Non accetta ordini: li concede. In battaglia è implacabile, ma mai crudele.<br><strong>Habitat:</strong> Allevati fin dalla nascita nelle capitali, in santuari custoditi da ordini antichi.</p>
+                    </div>
+                    <div>
+                        <h3 class="subsection-title"><span class="subsection-icon">🛡️</span>Legame Sacro – Compagno dei Puri</h3>
+                        <ul class="list-disc list-inside space-y-1 pl-4">
+                            <li>Auralon non è cavalcato: si offre.</li>
+                            <li>Si lega solo a paladini, guaritori, condottieri e spiriti martoriati ma incorruttibili.</li>
+                            <li>Se chi lo cavalca cade… Auralon scompare. Nessuno lo rivedrà mai più.</li>
+                        </ul>
+                    </div>
+                     <div>
+                        <h3 class="subsection-title"><span class="subsection-icon">?</span>Curiosità</h3>
+                        <ul class="list-disc list-inside space-y-1 pl-4">
+                           <li>Sebbene comuni nelle capitali, vengono trattati con lo stesso rispetto riservato agli alti ufficiali.</li>
+                           <li>Non rispondono mai due volte allo stesso padrone. La perdita del legame è un lutto.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </article>
+
+        <article class="creature-entry p-6 md:p-8 relative">
+            <h2 class="font-cinzel text-4xl creature-name mb-6 text-center">🐃 Kragghorn, la Furia delle Steppe Orche</h2>
+            <div class="grid md:grid-cols-5 gap-8">
+                <div class="md:col-span-2 flex justify-center items-start">
+                    <img src="https://i.postimg.cc/htF0cbpp/image.png" alt="Immagine del Kragghorn, un imponente bisonte da guerra orco" class="creature-image" onerror="this.onerror=null; this.src='https://placehold.co/300x400/000000/FFFFFF?text=Errore+Immagine';">
+                </div>
+                <div class="md:col-span-3 space-y-4">
+                    <div>
+                        <h3 class="text-2xl section-title mb-2">Descrizione Arcana</h3>
+                        <p class="leading-relaxed">Una bestia massiccia e muscolosa, simile a un bisonte di proporzioni titaniche. Pelo folto, scuro e arruffato, incrostato di fango e sangue. Enormi corna ricurve segnate da innumerevoli scontri.<br><strong>Tipo:</strong> Bestia da Guerra Orchesca / Cavalcatura da Soma</p>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl section-title mb-2">Comportamento e Habitat</h3>
+                        <p class="leading-relaxed"><strong>Comportamento:</strong> Ostinati e brutali, ma leali al loro clan. Usati per caricare le linee nemiche e trasportare macchine d'assedio.<br><strong>Habitat:</strong> Steppe aride, altipiani rocciosi e accampamenti orcheschi.</p>
+                    </div>
+                    <div>
+                        <h3 class="subsection-title"><span class="subsection-icon">✝️</span>Forma Corrotta – Kragghorn Furia Infernale</h3>
+                        <ul class="list-disc list-inside space-y-1 pl-4">
+                            <li>Pelo ispido come filo spinato, venature rosso sangue pulsano sotto la pelle.</li>
+                            <li>Le corna si ricoprono di rune oscure che scatenano esplosioni di energia negativa.</li>
+                            <li>Diventa incontrollabilmente aggressivo, mosso solo da una sete di distruzione.</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="subsection-title"><span class="subsection-icon">?</span>Curiosità</h3>
+                        <ul class="list-disc list-inside space-y-1 pl-4">
+                           <li>Gli orchi adornano le fortezze con le corna dei Kragghorn caduti.</li>
+                           <li>Può trainare il peso di dieci cavalli da guerra.</li>
+                           <li>I cuccioli sono sorprendentemente docili.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </article>
+
+        <article class="creature-entry p-6 md:p-8 relative">
+            <h2 class="font-cinzel text-4xl creature-name mb-6 text-center">🦇 Kharonax, il Solcanebbie Demoniaco</h2>
+            <div class="grid md:grid-cols-5 gap-8">
+                <div class="md:col-span-2 flex justify-center items-start">
+                    <img src="https://i.postimg.cc/Lsggyhcw/image.png" alt="Immagine di Kharonax, un destriero scheletrico con ali d'ombra" class="creature-image" onerror="this.onerror=null; this.src='https://placehold.co/300x400/000000/FFFFFF?text=Errore+Immagine';">
+                </div>
+                <div class="md:col-span-3 space-y-4">
+                    <div>
+                        <h3 class="text-2xl section-title mb-2">Descrizione Arcana</h3>
+                        <p class="leading-relaxed">Un corpo equino scheletrico avvolto da ombre fluttuanti. Grandi ali membranose lacerate. Orbite vuote da cui emana un bagliore rossastro e una criniera di fumo e sussurri.<br><strong>Tipo:</strong> Cavalcatura Demoniaca (Bestia Magica/Extraplanare)</p>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl section-title mb-2">Comportamento e Habitat</h3>
+                        <p class="leading-relaxed"><strong>Comportamento:</strong> Intelligenti ma selvaggi, domati solo da demoni potenti. Feroce in battaglia, capace di incutere terrore e muoversi tra le ombre.<br><strong>Habitat:</strong> Piani crepuscolari o reami al confine con l'Abisso. Evocati dove il velo tra i mondi è sottile.</p>
+                    </div>
+                    <div>
+                        <h3 class="subsection-title"><span class="subsection-icon">✝️</span>Forma Corrotta – Kharonax dell'Oblio</h3>
+                        <ul class="list-disc list-inside space-y-1 pl-4">
+                            <li>Le ombre che lo avvolgono diventano aggressive.</li>
+                            <li>Il bagliore nelle orbite proietta visioni di disperazione e follia.</li>
+                            <li>Le ali drenano l'energia vitale dall'ambiente.</li>
+                        </ul>
+                    </div>
+                     <div>
+                        <h3 class="subsection-title"><span class="subsection-icon">?</span>Curiosità</h3>
+                        <ul class="list-disc list-inside space-y-1 pl-4">
+                           <li>Il battito delle sue ali non produce suono.</li>
+                           <li>Le sue ossa vengono usate per creare potenti artefatti necromantici.</li>
+                           <li>Mostra un affetto contorto verso il demone a cui è legato.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </article>
+
+        <section>
+            <h2 class="category-title">🌲 Spiriti e Guardiani Naturali 🌲</h2>
+            <p class="category-note">
+                Gli Spiriti e i Guardiani Naturali di Anor sono intrinsecamente legati all'essenza pura del mondo. Questa profonda connessione li rende immuni alla corruzione oscura che affligge altre creature. Sebbene le manifestazioni della loro purezza possano variare, nessuno di essi può essere piegato al volere del male.
+            </p>
+        </section>
+
+        <article class="creature-entry p-6 md:p-8 relative">
+            <h2 class="font-cinzel text-4xl creature-name mb-6 text-center">🦌 Elarion, Spirito della Veglia Verde</h2>
+            <div class="grid md:grid-cols-5 gap-8">
+                <div class="md:col-span-2 flex justify-center items-start">
+                    <img src="https://i.postimg.cc/prG7k25G/image.png" alt="Immagine di Elarion, Spirito della Veglia Verde" class="creature-image" onerror="this.onerror=null; this.src='https://placehold.co/300x400/000000/FFFFFF?text=Errore+Immagine';">
+                </div>
+                <div class="md:col-span-3 space-y-4">
+                    <div>
+                        <h3 class="text-2xl section-title mb-2">Descrizione Arcana</h3>
+                        <p class="leading-relaxed">Un essere maestoso simile a un cervo leonino con corna ramificate che scintillano d’energia celeste. Ogni suo passo lascia germogli sul terreno.<br><strong>Tipo:</strong> Spirito Guardiano (Bestia magica)</p>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl section-title mb-2">Comportamento e Habitat</h3>
+                        <p class="leading-relaxed"><strong>Comportamento:</strong> Solitario e pacifico. Se tentato dalla corruzione, si dissolve in luce. Difende gli umani se la loro causa è giusta.<br><strong>Habitat:</strong> Foreste sacre, radure dimenticate.</p>
+                    </div>
+                    <div>
+                        <h3 class="subsection-title"><span class="subsection-icon">🌿</span>Incorruttibili per Natura</h3>
+                        <ul class="list-disc list-inside space-y-1 pl-4">
+                            <li>Non possono essere corrotti. Si sacrificano in un'esplosione purificatrice.</li>
+                            <li>Una sola lacrima di Elarion può guarire una foresta malata.</li>
+                        </ul>
+                    </div>
+                     <div>
+                        <h3 class="subsection-title"><span class="subsection-icon">?</span>Curiosità</h3>
+                        <ul class="list-disc list-inside space-y-1 pl-4">
+                           <li>Considerato un ponte tra il mondo naturale e il piano spirituale.</li>
+                           <li>Vederlo in sogno è segno di rinascita o protezione.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </article>
+        
+        <article class="creature-entry p-6 md:p-8 relative">
+            <h2 class="font-cinzel text-4xl creature-name mb-6 text-center">🐺 Kaeral, il Lupo delle Braci</h2>
+            <div class="grid md:grid-cols-5 gap-8">
+                <div class="md:col-span-2 flex justify-center items-start">
+                    <img src="https://i.postimg.cc/gJ9b4drD/image.png" alt="Immagine di Kaeral, il Lupo delle Braci" class="creature-image" onerror="this.onerror=null; this.src='https://placehold.co/300x400/000000/FFFFFF?text=Errore+Immagine';">
+                </div>
+                <div class="md:col-span-3 space-y-4">
+                    <div>
+                        <h3 class="text-2xl section-title mb-2">Descrizione Arcana</h3>
+                        <p class="leading-relaxed">Imponente creatura lupina, alta come un cavallo, dal manto screziato come corteccia incendiata. Corna nere e occhi ambra. Il respiro è caldo come un focolare.<br><strong>Tipo:</strong> Spirito Lupino (Bestia Magica)</p>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl section-title mb-2">Comportamento e Habitat</h3>
+                        <p class="leading-relaxed"><strong>Comportamento:</strong> Pacifico, sceglie un solo compagno mortale. Protettore e guaritore, mai aggressivo per natura.<br><strong>Habitat:</strong> Altopiani, foreste temperate, vicino a villaggi.</p>
+                    </div>
+                    <div>
+                        <h3 class="subsection-title"><span class="subsection-icon">🔥</span>Lega del Cuore Ardente</h3>
+                        <ul class="list-disc list-inside space-y-1 pl-4">
+                            <li>Il suo cuore pulsa in sintonia con quello del compagno.</li>
+                            <li>Se il compagno muore, si dissolve in cenere, lasciando un fiore incandescente.</li>
+                        </ul>
+                    </div>
+                     <div>
+                        <h3 class="subsection-title"><span class="subsection-icon">🔥</span>Purezza Ardente</h3>
+                        <ul class="list-disc list-inside space-y-1 pl-4">
+                           <li>Immune alla corruzione. Può immolarsi in una fiammata purificatrice.</li>
+                        </ul>
+                    </div>
+                     <div>
+                        <h3 class="subsection-title"><span class="subsection-icon">?</span>Curiosità</h3>
+                        <ul class="list-disc list-inside space-y-1 pl-4">
+                           <li>Vederlo in sogno è presagio di guarigione.</li>
+                           <li>Il suo pelo è sacro: toccarlo porta conforto, strapparlo è blasfemo.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </article>
+
+         <article class="creature-entry p-6 md:p-8 relative">
+            <h2 class="font-cinzel text-4xl creature-name mb-6 text-center">🦋 Miyura, la Grazia Sofferente</h2>
+            <div class="grid md:grid-cols-5 gap-8">
+                <div class="md:col-span-2 flex justify-center items-start">
+                    <img src="https://i.postimg.cc/Y91Z3s4L/image.png" alt="Immagine di Miyura, la Grazia Sofferente, uno spirito celeste con ali di falena" class="creature-image" onerror="this.onerror=null; this.src='https://placehold.co/300x400/000000/FFFFFF?text=Errore+Immagine';">
+                </div>
+                <div class="md:col-span-3 space-y-4">
+                    <div>
+                        <h3 class="text-2xl section-title mb-2">Descrizione Arcana</h3>
+                        <p class="leading-relaxed">Corpo sottile, pelle d’alabastro. Le ali, simili a quelle di una falena lunare, si aprono lente come sospiri. Gli occhi restano chiusi, ma tutto vede.<br><strong>Tipo:</strong> Spirito Celeste della Guarigione</p>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl section-title mb-2">Comportamento e Habitat</h3>
+                        <p class="leading-relaxed"><strong>Comportamento:</strong> Si manifesta nei momenti di dolore puro o innocenza. Non parla, non combatte. Appare, osserva e dona.<br><strong>Habitat:</strong> Non appartiene a un luogo. Vive nei crepuscoli, nei santuari, nei sogni.</p>
+                    </div>
+                    <div>
+                        <h3 class="subsection-title"><span class="subsection-icon">🎁</span>Dono Spirituale – Benedizione Imprevedibile</h3>
+                        <ul class="list-disc list-inside space-y-1 pl-4">
+                            <li>Quando tocca un essere, una forza sconosciuta germoglia: luce, parola, fiamma o cura.</li>
+                            <li>Il dono è misterioso e irripetibile, sempre per proteggere.</li>
+                        </ul>
+                    </div>
+                     <div>
+                        <h3 class="subsection-title"><span class="subsection-icon">?</span>Curiosità</h3>
+                        <ul class="list-disc list-inside space-y-1 pl-4">
+                           <li>Chiamata La Mano Bianca o La Falena del Perdono.</li>
+                           <li>Chi riceve il suo dono non riesce mai più a odiare con tutto il cuore.</li>
+                           <li>Si dice che tenga la mano ai moribondi.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </article>
+
+        <section>
+            <h2 class="category-title">🐾 Bestie Anomale e Giganti 🏔️</h2>
+            <p class="category-note">Questa sezione raccoglie creature imponenti, predatori unici e giganti che scuotono la terra di Anor, ognuno con le proprie peculiarità e pericoli.</p>
+        </section>
+
+        <article class="creature-entry p-6 md:p-8 relative">
+            <h2 class="font-cinzel text-4xl creature-name mb-6 text-center">🐏 Crivorn</h2>
+            <div class="grid md:grid-cols-5 gap-8">
+                <div class="md:col-span-2 flex justify-center items-start">
+                    <img src="https://i.postimg.cc/CxwPzDyY/image.png" alt="Immagine di Crivorn, predatore alpino" class="creature-image" onerror="this.onerror=null; this.src='https://placehold.co/300x400/000000/FFFFFF?text=Errore+Immagine';">
+                </div>
+                <div class="md:col-span-3 space-y-4">
+                    <div>
+                        <h3 class="text-2xl section-title mb-2">Descrizione Arcana</h3>
+                        <p class="leading-relaxed">Creatura montana alta oltre tre metri, pelle ispida, occhi di ghiaccio. Le corna ricurve emettono un suono sordo tra le rocce.<br><strong>Tipo:</strong> Predatore alpino ancestrale</p>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl section-title mb-2">Comportamento e Habitat</h3>
+                        <p class="leading-relaxed"><strong>Comportamento:</strong> Solitario, caccia al tramonto. Segue l’odore del sangue per chilometri.<br><strong>Habitat:</strong> Grotte nascoste nelle vette innevate.</p>
+                    </div>
+                    <div>
+                        <h3 class="subsection-title"><span class="subsection-icon">✝️</span>Forma Corrotta – Crivòrn Atroce</h3>
+                        <ul class="list-disc list-inside space-y-1 pl-4">
+                            <li>Corna come corone spezzate, corpo fuso con metallo oscuro.</li>
+                            <li>Fame di obbedienza e annientamento.</li>
+                            <li>Dove passa, la neve si tinge di nero.</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="subsection-title"><span class="subsection-icon">?</span>Curiosità</h3>
+                        <ul class="list-disc list-inside space-y-1 pl-4">
+                           <li>I cacciatori evitano le zone dove si odono le sue corna.</li>
+                           <li>Le corna possono essere usate per creare talismani contro il freddo.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </article>
+
+        <article class="creature-entry p-6 md:p-8 relative">
+            <h2 class="font-cinzel text-4xl creature-name mb-6 text-center">🧊 Gigante dei Ghiacci Eterni</h2>
+            <div class="grid md:grid-cols-5 gap-8">
+                <div class="md:col-span-2 flex justify-center items-start">
+                    <img src="https://i.postimg.cc/sDYHjmNw/image.png" alt="Immagine del Gigante dei Ghiacci Eterni" class="creature-image" onerror="this.onerror=null; this.src='https://placehold.co/300x400/000000/FFFFFF?text=Errore+Immagine';">
+                </div>
+                <div class="md:col-span-3 space-y-4">
+                    <div>
+                        <h3 class="text-2xl section-title mb-2">Descrizione Arcana</h3>
+                        <p class="leading-relaxed">Figura imponente alta decine di metri. Pelle bluastra, barba incrostata di brina.<br><strong>Tipo:</strong> Gigante di ghiaccio</p>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl section-title mb-2">Comportamento e Habitat</h3>
+                        <p class="leading-relaxed"><strong>Comportamento:</strong> Solitario, osservatore, saggio.<br><strong>Habitat:</strong> Vette glaciali.</p>
+                    </div>
+                    <div>
+                        <h3 class="subsection-title"><span class="subsection-icon">✝️</span>Forma Corrotta – Incubo del Gelo Nero</h3>
+                        <ul class="list-disc list-inside space-y-1 pl-4">
+                            <li>Pelle trasparente con sangue nero congelato.</li>
+                            <li>Blizzard parlanti che annientano la volontà.</li>
+                            <li>Caccia spiriti buoni per rinchiuderli nel ghiaccio.</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="subsection-title"><span class="subsection-icon">?</span>Curiosità</h3>
+                        <ul class="list-disc list-inside space-y-1 pl-4">
+                           <li>Venerato da alcuni nomadi come divinità del freddo.</li>
+                           <li>Si mormora che il suo cuore contenga un frammento dell'inverno primordiale.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </article>
+
+        <article class="creature-entry p-6 md:p-8 relative">
+            <h2 class="font-cinzel text-4xl creature-name mb-6 text-center">⛰️ Gigante di Pietraspina</h2>
+            <div class="grid md:grid-cols-5 gap-8">
+                <div class="md:col-span-2 flex justify-center items-start">
+                    <img src="https://i.postimg.cc/25zwSfZ5/image.png" alt="Immagine del Gigante di Pietraspina" class="creature-image" onerror="this.onerror=null; this.src='https://placehold.co/300x400/000000/FFFFFF?text=Errore+Immagine';">
+                </div>
+                <div class="md:col-span-3 space-y-4">
+                    <div>
+                        <h3 class="text-2xl section-title mb-2">Descrizione Arcana</h3>
+                        <p class="leading-relaxed">Un colosso di roccia viva alto più di 40 metri. Dalla schiena sporgono aguzze spine di roccia.<br><strong>Tipo:</strong> Gigante elementale</p>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl section-title mb-2">Comportamento e Habitat</h3>
+                        <p class="leading-relaxed"><strong>Comportamento:</strong> Guardiano silenzioso delle montagne.<br><strong>Habitat:</strong> Valli antiche e santuari.</p>
+                    </div>
+                    <div>
+                        <h3 class="subsection-title"><span class="subsection-icon">✝️</span>Forma Corrotta – Colosso della Tirannia</h3>
+                        <ul class="list-disc list-inside space-y-1 pl-4">
+                            <li>Catene fuse nel corpo, occhi di fuoco oppressivo.</li>
+                            <li>Ogni passo genera onde di disperazione.</li>
+                            <li>Incatenato alla volontà di Bane, travolge città.</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="subsection-title"><span class="subsection-icon">?</span>Curiosità</h3>
+                        <ul class="list-disc list-inside space-y-1 pl-4">
+                           <li>I nani trovano vene di minerali preziosi seguendo le sue tracce.</li>
+                           <li>Se riposa per secoli, può trasformarsi in una montagna.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </article>
+
+        <article class="creature-entry p-6 md:p-8 relative">
+            <h2 class="font-cinzel text-4xl creature-name mb-6 text-center">🌋 Gigante della Cenere</h2>
+            <div class="grid md:grid-cols-5 gap-8">
+                <div class="md:col-span-2 flex justify-center items-start">
+                    <img src="https://i.postimg.cc/DfDBdDtC/image.png" alt="Immagine del Gigante della Cenere" class="creature-image" onerror="this.onerror=null; this.src='https://placehold.co/300x400/000000/FFFFFF?text=Errore+Immagine';">
+                </div>
+                <div class="md:col-span-3 space-y-4">
+                    <div>
+                        <h3 class="text-2xl section-title mb-2">Descrizione Arcana</h3>
+                        <p class="leading-relaxed">Un titano alto più di 50 metri. Pelle annerita come carbone ardente, occhi come magma. Brandisce una spada di ossidiana vulcanica.<br><strong>Tipo:</strong> Gigante vulcanico</p>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl section-title mb-2">Comportamento e Habitat</h3>
+                        <p class="leading-relaxed"><strong>Comportamento:</strong> Dorme per secoli, si sveglia solo per grandi catastrofi.<br><strong>Habitat:</strong> Crateri e grotte infuocate.</p>
+                    </div>
+                    <div>
+                        <h3 class="subsection-title"><span class="subsection-icon">✝️</span>Forma Corrotta – Araldo di Dominus</h3>
+                        <ul class="list-disc list-inside space-y-1 pl-4">
+                            <li>Cuore di lava tirannica, sangue che brucia l'anima.</li>
+                            <li>Distrugge la speranza con ogni colpo.</li>
+                            <li>Apre varchi verso l’Infernum.</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="subsection-title"><span class="subsection-icon">?</span>Curiosità</h3>
+                        <ul class="list-disc list-inside space-y-1 pl-4">
+                           <li>Le ceneri lasciate dal suo passaggio sono incredibilmente fertili.</li>
+                           <li>Alcuni culti cercano di risvegliarlo per purificare il mondo.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </article>
+
+        <article class="creature-entry p-6 md:p-8 relative">
+            <h2 class="font-cinzel text-4xl creature-name mb-6 text-center">🌊 Akhlut, Predatore dei Ghiacci</h2>
+            <div class="grid md:grid-cols-5 gap-8">
+                <div class="md:col-span-2 flex justify-center items-start">
+                    <img src="https://i.postimg.cc/y8wk3vwS/image.png" alt="Immagine dell'Akhlut, un ibrido orca-lupo" class="creature-image" onerror="this.onerror=null; this.src='https://placehold.co/300x400/000000/FFFFFF?text=Errore+Immagine';">
+                </div>
+                <div class="md:col-span-3 space-y-4">
+                    <div>
+                        <h3 class="text-2xl section-title mb-2">Descrizione Arcana</h3>
+                        <p class="leading-relaxed">Temibile fusione tra un'orca e un massiccio lupo. Corpo liscio da orca nella parte posteriore e da lupo mostruoso in quella anteriore.<br><strong>Tipo:</strong> Predatore Magico Marino (Bestia Anomala)</p>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl section-title mb-2">Comportamento e Habitat</h3>
+                        <p class="leading-relaxed"><strong>Comportamento:</strong> Cacciatori astuti e spietati, capaci di operare sia in acqua che su terra. Cacciano in piccoli branchi.<br><strong>Habitat:</strong> Mari artici, fiordi ghiacciati, coste rocciose.</p>
+                    </div>
+                    <div>
+                        <h3 class="subsection-title"><span class="subsection-icon">✝️</span>Forma Corrotta – Akhlut delle Profondità Oscure</h3>
+                        <ul class="list-disc list-inside space-y-1 pl-4">
+                            <li>Pelo nero intriso di muco gelido. Occhi rossi e fauci che secernono veleno.</li>
+                            <li>La sua intelligenza diventa sadica, gode nel terrorizzare le prede.</li>
+                            <li>Emette un canto spettrale che attira le navi verso gli iceberg.</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="subsection-title"><span class="subsection-icon">?</span>Curiosità</h3>
+                        <ul class="list-disc list-inside space-y-1 pl-4">
+                           <li>Considerati spiriti vendicativi del mare.</li>
+                           <li>I loro denti sono trofei di grande valore.</li>
+                           <li>Devono periodicamente tornare in superficie per respirare.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </article>
+        
+        <section>
+            <h2 class="category-title">🌌 Entità Cosmiche e Messaggeri 🌌</h2>
+        </section>
+
+        <article class="creature-entry p-6 md:p-8 relative">
+            <h2 class="font-cinzel text-4xl creature-name mb-6 text-center">Voidness – I Messaggeri dell’Abisso</h2>
+            <div class="grid md:grid-cols-5 gap-8">
+                <div class="md:col-span-2 flex justify-center items-start">
+                    <img src="https://i.postimg.cc/Gp2XjCh5/image.png" alt="Immagine dei Voidness, entità d'ombra cosmica" class="creature-image" onerror="this.onerror=null; this.src='https://placehold.co/300x400/000000/FFFFFF?text=Errore+Immagine';">
+                </div>
+                <div class="md:col-span-3 space-y-4">
+                    <div>
+                        <h3 class="text-2xl section-title mb-2">Descrizione Arcana</h3>
+                        <p class="leading-relaxed">Alti, silenziosi, composti di ombra cosmica. Il volto è dominato da un solo simbolo: una stella incandescente, un occhio eterno.</p>
+                        <p class="quote-bestiary mt-4">
+                           "Ci sono sguardi che si sentono ma non si vedono. Ombre che si muovono senza corpo, e un silenzio che pesa come verità taciute."
+                        </p>
+                    </div>
+                    <div>
+                        <h3 class="subsection-title mt-3 mb-1">Dettagli Conosciuti</h3>
+                        <ul class="list-disc list-inside space-y-1 pl-4">
+                            <li><strong>Altezza:</strong> 2–2,3 metri</li>
+                            <li><strong>Natura:</strong> Entità cosmiche d’ombra</li>
+                            <li><strong>Affiliazione:</strong> Noxar, il Fabbricatore della Realtà</li>
+                        </ul>
+                    </div>
+                     <div>
+                        <h3 class="text-2xl section-title mb-2 mt-4">Comportamento</h3>
+                        <p class="leading-relaxed">Non parlano. Non attaccano. Osservano. Si dice siano messaggeri di Noxar.</p>
+                    </div>
+                     <div>
+                        <h3 class="subsection-title"><span class="subsection-icon">?</span>Curiosità</h3>
+                        <ul class="list-disc list-inside space-y-1 pl-4">
+                           <li>La stella sulla loro fronte potrebbe essere una costellazione collassata.</li>
+                           <li>È impossibile mentire in loro presenza.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </article>
+
+        <section>
+            <h2 class="category-title">💀 Aberrazioni e Orrori Minori 💀</h2>
+        </section>
+
+        <article class="creature-entry p-6 md:p-8 relative">
+            <h2 class="font-cinzel text-4xl creature-name mb-6 text-center">🐙 Ulgrak il Sussurrante</h2>
+            <div class="grid md:grid-cols-5 gap-8">
+                <div class="md:col-span-2 flex justify-center items-start">
+                    <img src="https://i.postimg.cc/bNr0MTjZ/image.png" alt="Immagine di Ulgrak il Sussurrante, aberrazione tentacolare" class="creature-image" onerror="this.onerror=null; this.src='https://placehold.co/300x400/000000/FFFFFF?text=Errore+Immagine';">
+                </div>
+                <div class="md:col-span-3 space-y-4">
+                    <div>
+                        <h3 class="text-2xl section-title mb-2">Descrizione Arcana</h3>
+                        <p class="leading-relaxed">Aberrazione tentacolare dalle sembianze umanoidi. Pelle nera e umida, coperta da occhi gialli che si aprono nel buio. I tentacoli sul volto trasmettono mormorii che confondono la mente.<br><strong>Tipo:</strong> Aberrazione minore</p>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl section-title mb-2">Comportamento e Habitat</h3>
+                        <p class="leading-relaxed"><strong>Comportamento:</strong> Caccia nel silenzio. Si nutre di paura e dolore.<br><strong>Habitat:</strong> Grotte infestate, rovine dimenticate.</p>
+                    </div>
+                     <div>
+                        <h3 class="subsection-title"><span class="subsection-icon">✝️</span>Forma Corrotta – Ulgrak Profanato</h3>
+                        <ul class="list-disc list-inside space-y-1 pl-4">
+                            <li>Occhi rossi, i suoi tentacoli diventano lame vive.</li>
+                            <li>Non uccide subito: domina, tormenta, spezza la volontà.</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="subsection-title"><span class="subsection-icon">?</span>Curiosità</h3>
+                        <ul class="list-disc list-inside space-y-1 pl-4">
+                           <li>I suoi sussurri sono frammenti di pensieri rubati alle vittime.</li>
+                           <li>I suoi occhi possono vedere le paure più recondite.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </article>
+
+        <article class="creature-entry p-6 md:p-8 relative">
+            <h2 class="font-cinzel text-4xl creature-name mb-6 text-center">💧 Vurghal, Ombra Sibilante</h2>
+            <div class="grid md:grid-cols-5 gap-8">
+                <div class="md:col-span-2 flex justify-center items-start">
+                    <img src="https://i.postimg.cc/brsG6m28/image.png" alt="Immagine di Vurghal, Ombra Sibilante, aberrazione acquatica" class="creature-image" onerror="this.onerror=null; this.src='https://placehold.co/300x400/000000/FFFFFF?text=Errore+Immagine';">
+                </div>
+                <div class="md:col-span-3 space-y-4">
+                    <div>
+                        <h3 class="text-2xl section-title mb-2">Descrizione Arcana</h3>
+                        <p class="leading-relaxed">Creatura anfibia alta 3 metri, arti sproporzionati. Pelle squamosa e violacea. Ali membranose atrofizzate. La sua presenza è accompagnata da un sibilo costante.<br><strong>Tipo:</strong> Aberrazione acquatica</p>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl section-title mb-2">Comportamento e Habitat</h3>
+                        <p class="leading-relaxed"><strong>Comportamento:</strong> Caccia nelle nebbie o nell’acqua torbida. Si nutre di emozioni intense.<br><strong>Habitat:</strong> Paludi corrotte, fiumi contaminati.</p>
+                    </div>
+                     <div>
+                        <h3 class="subsection-title"><span class="subsection-icon">✝️</span>Forma Corrotta – Figlio del Silenzio</h3>
+                        <ul class="list-disc list-inside space-y-1 pl-4">
+                            <li>La sua voce è un sussurro del Vuoto.</li>
+                            <li>Chi lo guarda troppo a lungo sente la mente vacillare.</li>
+                            <li>Al suo tocco, i sogni marciscono.</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="subsection-title"><span class="subsection-icon">?</span>Curiosità</h3>
+                        <ul class="list-disc list-inside space-y-1 pl-4">
+                           <li>I pescatori evitano le acque dove si odono i suoi sibili.</li>
+                           <li>Le sue squame possono essere usate per creare pozioni che inducono visioni.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </article>
+
+        <article class="creature-entry p-6 md:p-8 relative">
+            <h2 class="font-cinzel text-4xl creature-name mb-6 text-center">💀 Skelmir</h2>
+            <div class="grid md:grid-cols-5 gap-8">
+                <div class="md:col-span-2 flex justify-center items-start">
+                    <img src="https://i.postimg.cc/G2sHb2dY/image.png" alt="Immagine dello Skelmir, un'abominazione dalla pelle scura e artigliata" class="creature-image" onerror="this.onerror=null; this.src='https://placehold.co/300x400/000000/FFFFFF?text=Errore+Immagine';">
+                </div>
+                <div class="md:col-span-3 space-y-4">
+                    <div>
+                        <h3 class="text-2xl section-title mb-2">Descrizione Arcana</h3>
+                        <p class="leading-relaxed">Umanoide dalla pelle nera e lucida. Braccia sproporzionate con artigli. Volto privo di occhi, con una bocca che si spalanca lateralmente.<br><strong>Tipo:</strong> Creatura corrotta (Aberrazione)</p>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl section-title mb-2">Comportamento e Habitat</h3>
+                        <p class="leading-relaxed"><strong>Comportamento:</strong> Si muove a scatti, osserva senza occhi. Caccia di notte in branchi, nutrendosi di carne viva.<br><strong>Habitat:</strong> Rovine, catacombe, templi profanati.</p>
+                    </div>
+                     <div>
+                        <h3 class="subsection-title"><span class="subsection-icon">✝️</span>Nati dalla Corruzione</h3>
+                        <ul class="list-disc list-inside space-y-1 pl-4">
+                           <li>Lo Skelmir non ha una forma non corrotta; nasce così.</li>
+                           <li>È l’incarnazione di un’infezione primordiale.</li>
+                        </ul>
+                    </div>
+                     <div>
+                        <h3 class="subsection-title"><span class="subsection-icon">?</span>Curiosità</h3>
+                        <ul class="list-disc list-inside space-y-1 pl-4">
+                           <li>Percepisce l'ambiente attraverso vibrazioni.</li>
+                           <li>Il suo rantolo gorgogliante può indurre nausea e vertigini.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </article>
+
+        <section>
+            <h2 class="category-title">🐉 Draghi Titanici Elementali 🐉</h2>
+        </section>
+
+        <article class="creature-entry p-6 md:p-8 relative">
+            <h2 class="font-cinzel text-4xl creature-name mb-6 text-center">🔥 Pyrokar, il Drago del Fuoco</h2>
+            <div class="grid md:grid-cols-5 gap-8">
+                <div class="md:col-span-2 flex justify-center items-start">
+                    <img src="https://i.postimg.cc/52fvwSN7/image.png" alt="Immagine di Pyrokar, il Drago del Fuoco" class="creature-image" onerror="this.onerror=null; this.src='https://placehold.co/300x400/000000/FFFFFF?text=Errore+Immagine';">
+                </div>
+                <div class="md:col-span-3 space-y-4">
+                    <div>
+                        <h3 class="text-2xl section-title mb-2">Descrizione Arcana</h3>
+                        <p class="leading-relaxed">Scaglie incandescenti, ali come colate laviche.<br><strong>Tipo:</strong> Drago Titanico</p>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl section-title mb-2">Comportamento e Habitat</h3>
+                        <p class="leading-relaxed"><strong>Comportamento:</strong> Dominatore e distruttivo, odia la debolezza.<br><strong>Habitat:</strong> Caldere vulcaniche.</p>
+                    </div>
+                    <div>
+                        <h3 class="subsection-title"><span class="subsection-icon">✝️</span>Forma Corrotta – Pyrokar il Bruciamondi</h3>
+                        <ul class="list-disc list-inside space-y-1 pl-4">
+                            <li>Fiamme nere che divorano anche i sogni.</li>
+                            <li>Il suo fuoco corrotto brucia l’esistenza stessa.</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="subsection-title"><span class="subsection-icon">?</span>Curiosità</h3>
+                        <ul class="list-disc list-inside space-y-1 pl-4">
+                           <li>Il suo cuore arde con l'intensità di un sole.</li>
+                           <li>Le sue scaglie sono ricercate dai fabbri per forgiare armi.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </article>
+
+        <article class="creature-entry p-6 md:p-8 relative">
+            <h2 class="font-cinzel text-4xl creature-name mb-6 text-center">❄️ Glacieth, il Drago del Ghiaccio</h2>
+            <div class="grid md:grid-cols-5 gap-8">
+                <div class="md:col-span-2 flex justify-center items-start">
+                    <img src="https://i.postimg.cc/JzBw5Z6X/image.png" alt="Immagine di Glacieth, il Drago del Ghiaccio" class="creature-image" onerror="this.onerror=null; this.src='https://placehold.co/300x400/000000/FFFFFF?text=Errore+Immagine';">
+                </div>
+                <div class="md:col-span-3 space-y-4">
+                    <div>
+                        <h3 class="text-2xl section-title mb-2">Descrizione Arcana</h3>
+                        <p class="leading-relaxed">Un serpente alato di cristallo gelato.<br><strong>Tipo:</strong> Drago Titanico</p>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl section-title mb-2">Comportamento e Habitat</h3>
+                        <p class="leading-relaxed"><strong>Comportamento:</strong> Freddo e calcolatore.<br><strong>Habitat:</strong> Ghiacciai eterni.</p>
+                    </div>
+                    <div>
+                        <h3 class="subsection-title"><span class="subsection-icon">✝️</span>Forma Corrotta – Glacieth il Congelacuori</h3>
+                        <ul class="list-disc list-inside space-y-1 pl-4">
+                            <li>Soffio gelido che congela anche le emozioni.</li>
+                            <li>Parla con voci intrappolate nel ghiaccio.</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="subsection-title"><span class="subsection-icon">?</span>Curiosità</h3>
+                        <ul class="list-disc list-inside space-y-1 pl-4">
+                           <li>Le sue scaglie sono fredde come diamanti.</li>
+                           <li>Guardiano dei segreti nascosti sotto i ghiacciai.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </article>
+
+        <article class="creature-entry p-6 md:p-8 relative">
+            <h2 class="font-cinzel text-4xl creature-name mb-6 text-center">⚡ Tonarion, il Drago del Tuono</h2>
+            <div class="grid md:grid-cols-5 gap-8">
+                <div class="md:col-span-2 flex justify-center items-start">
+                    <img src="https://i.postimg.cc/PrVh4tdg/image.png" alt="Immagine di Tonarion, il Drago del Tuono" class="creature-image" onerror="this.onerror=null; this.src='https://placehold.co/300x400/000000/FFFFFF?text=Errore+Immagine';">
+                </div>
+                <div class="md:col-span-3 space-y-4">
+                    <div>
+                        <h3 class="text-2xl section-title mb-2">Descrizione Arcana</h3>
+                        <p class="leading-relaxed">Corpo squamato e metallico, con creste simili a parafulmini.<br><strong>Tipo:</strong> Drago Titanico</p>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl section-title mb-2">Comportamento e Habitat</h3>
+                        <p class="leading-relaxed"><strong>Comportamento:</strong> Imprevedibile, esplosivo, quasi folle.<br><strong>Habitat:</strong> Tempeste eterne.</p>
+                    </div>
+                    <div>
+                        <h3 class="subsection-title"><span class="subsection-icon">✝️</span>Forma Corrotta – Tonarion il Frantumavolontà</h3>
+                        <ul class="list-disc list-inside space-y-1 pl-4">
+                            <li>Ogni ruggito è un'esplosione psichica.</li>
+                            <li>Si nutre della paura generata dal boato.</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="subsection-title"><span class="subsection-icon">?</span>Curiosità</h3>
+                        <ul class="list-disc list-inside space-y-1 pl-4">
+                           <li>Le sue creste vibrano prima di una grande tempesta.</li>
+                           <li>Frammenti delle sue scaglie sono presagi di grandi cambiamenti.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </article>
+
+        <article class="creature-entry p-6 md:p-8 relative">
+            <h2 class="font-cinzel text-4xl creature-name mb-6 text-center">🌪️ Aeralis, il Drago del Vento</h2>
+            <div class="grid md:grid-cols-5 gap-8">
+                <div class="md:col-span-2 flex justify-center items-start">
+                    <img src="https://i.postimg.cc/y6P7DmtY/image.png" alt="Immagine di Aeralis, il Drago del Vento" class="creature-image" onerror="this.onerror=null; this.src='https://placehold.co/300x400/000000/FFFFFF?text=Errore+Immagine';">
+                </div>
+                <div class="md:col-span-3 space-y-4">
+                    <div>
+                        <h3 class="text-2xl section-title mb-2">Descrizione Arcana</h3>
+                        <p class="leading-relaxed">Sottile e serpentiforme, si muove tra le nubi.<br><strong>Tipo:</strong> Drago Titanico</p>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl section-title mb-2">Comportamento e Habitat</h3>
+                        <p class="leading-relaxed"><strong>Comportamento:</strong> Indifferente, spesso invisibile.<br><strong>Habitat:</strong> Cieli alti e vuoti.</p>
+                    </div>
+                    <div>
+                        <h3 class="subsection-title"><span class="subsection-icon">✝️</span>Forma Corrotta – Aeralis il Vuotocanto</h3>
+                        <ul class="list-disc list-inside space-y-1 pl-4">
+                            <li>Il suo volo risucchia l’aria e la speranza.</li>
+                            <li>Parla con le voci di chi è morto cadendo nel cielo.</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="subsection-title"><span class="subsection-icon">?</span>Curiosità</h3>
+                        <ul class="list-disc list-inside space-y-1 pl-4">
+                           <li>Avvistarlo è presagio di tempeste o venti favorevoli.</li>
+                           <li>Il suo passaggio è percepito solo da un silenzio innaturale.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </article>
+
+        <article class="creature-entry p-6 md:p-8 relative">
+            <h2 class="font-cinzel text-4xl creature-name mb-6 text-center">🌍 Terragor, il Drago della Terra</h2>
+            <div class="grid md:grid-cols-5 gap-8">
+                <div class="md:col-span-2 flex justify-center items-start">
+                    <img src="https://i.postimg.cc/Jzt7VsT7/image.png" alt="Immagine di Terragor, il Drago della Terra" class="creature-image" onerror="this.onerror=null; this.src='https://placehold.co/300x400/000000/FFFFFF?text=Errore+Immagine';">
+                </div>
+                <div class="md:col-span-3 space-y-4">
+                    <div>
+                        <h3 class="text-2xl section-title mb-2">Descrizione Arcana</h3>
+                        <p class="leading-relaxed">Colossale, con pietra e metallo fusi nel corpo.<br><strong>Tipo:</strong> Drago Titanico</p>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl section-title mb-2">Comportamento e Habitat</h3>
+                        <p class="leading-relaxed"><strong>Comportamento:</strong> Lento ma inarrestabile.<br><strong>Habitat:</strong> Caverne mitiche, deserti.</p>
+                    </div>
+                    <div>
+                        <h3 class="subsection-title"><span class="subsection-icon">✝️</span>Forma Corrotta – Terragor il Sepoltore d’Anime</h3>
+                        <ul class="list-disc list-inside space-y-1 pl-4">
+                            <li>I suoi passi causano terremoti mentali.</li>
+                            <li>Il suo respiro pietrifica i ricordi.</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="subsection-title"><span class="subsection-icon">?</span>Curiosità</h3>
+                        <ul class="list-disc list-inside space-y-1 pl-4">
+                           <li>Quando dorme, nuove catene montuose possono sorgere.</li>
+                           <li>Frammenti delle sue scaglie hanno poteri elementali.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </article>
+
+        <article class="creature-entry p-6 md:p-8 relative">
+            <h2 class="font-cinzel text-4xl creature-name mb-6 text-center">🌀 Gravithex, il Drago della Gravità</h2>
+            <div class="grid md:grid-cols-5 gap-8">
+                <div class="md:col-span-2 flex justify-center items-start">
+                    <img src="https://i.postimg.cc/J4r4x6Zk/image.png" alt="Immagine di Gravithex, il Drago della Gravità" class="creature-image" onerror="this.onerror=null; this.src='https://placehold.co/300x400/000000/FFFFFF?text=Errore+Immagine';">
+                </div>
+                <div class="md:col-span-3 space-y-4">
+                    <div>
+                        <h3 class="text-2xl section-title mb-2">Descrizione Arcana</h3>
+                        <p class="leading-relaxed">Scaglie scure come buchi neri, fluttua senza ali. Gli occhi sono vortici che inghiottono luce.<br><strong>Tipo:</strong> Drago Titanico Singolare</p>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl section-title mb-2">Comportamento e Habitat</h3>
+                        <p class="leading-relaxed"><strong>Comportamento:</strong> Divino, distante, sopra ogni cosa.<br><strong>Habitat:</strong> Orbita tra le crepe del cielo.</p>
+                    </div>
+                    <div>
+                        <h3 class="subsection-title"><span class="subsection-icon">✝️</span>Forma Corrotta – Gravithex il Curvafato</h3>
+                        <ul class="list-disc list-inside space-y-1 pl-4">
+                            <li>Altera il peso del mondo. Le sue parole piegano lo spazio.</li>
+                            <li>Anche il tempo si curva alla sua presenza.</li>
+                        </ul>
+                    </div>
+                     <div>
+                        <h3 class="subsection-title"><span class="subsection-icon">?</span>Curiosità</h3>
+                        <ul class="list-disc list-inside space-y-1 pl-4">
+                           <li>Potrebbe essere una manifestazione fisica delle leggi dell'universo.</li>
+                           <li>Osservare i suoi occhi può mostrare il futuro o il passato.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </article>
+        
+    </main>
+
+    <footer class="text-center mt-24 py-8 border-t border-gray-800 relative z-10">
+        <p class="text-gray-500">&copy; <span id="currentYear"></span> Giovanni Ettorre e Lorenzo Ferrise / Anor. Tutti i diritti riservati alle leggende.</p>
+    </footer>
+
+    <script>
+        // Script per l'anno corrente nel footer
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+        
+        // Script per l'animazione al scroll (invariato)
+        const animatedElements = document.querySelectorAll('.creature-entry, .category-title, .note-section, .text-center, .category-note');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('fade-in-section');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1 });
+
+        animatedElements.forEach(el => {
+            el.style.opacity = '0'; 
+            observer.observe(el);
+        });
+
+        // --- SCRIPT DELLO SFONDO STELLATO OTTIMIZZATO ---
+        const canvas = document.getElementById('starfield');
+        const ctx = canvas.getContext('2d');
+
+        // Funzione di ridimensionamento corretta
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight; // Usa l'altezza della finestra, non del documento
+        }
+
+        let stars = [];
+        const numStars = 400; // Leggermente ridotto per ulteriore performance
+
+        function initStars() {
+            stars = [];
+            for (let i = 0; i < numStars; i++) {
+                stars.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    radius: Math.random() * 1.5 + 0.5, 
+                    vx: (Math.random() - 0.5) / 4,
+                    vy: Math.random() * 0.2 + 0.3,
+                    opacity: Math.random() * 0.6 + 0.2, 
+                    opacityDirection: Math.random() > 0.5 ? 1 : -1
+                });
+            }
+        }
+
+        function drawStars() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.globalAlpha = 1.0; // Resetta l'opacità globale
+            ctx.fillStyle = '#ffffff';
+            ctx.shadowColor = '#ffffff';
+            ctx.shadowBlur = 10;
+            
+            stars.forEach(star => {
+                ctx.beginPath();
+                ctx.globalAlpha = star.opacity;
+                ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+                ctx.fill();
+            });
+            
+            ctx.globalAlpha = 1.0;
+            ctx.shadowBlur = 0;
+        }
+
+        function updateStars() {
+            stars.forEach(star => {
+                star.x += star.vx;
+                star.y += star.vy;
+
+                star.opacity += 0.004 * star.opacityDirection;
+                if (star.opacity > 0.8 || star.opacity < 0.1) {
+                    star.opacityDirection *= -1;
+                }
+
+                // Ricicla le stelle che escono dallo schermo
+                if (star.y > canvas.height + star.radius) {
+                    star.y = 0 - star.radius;
+                    star.x = Math.random() * canvas.width;
+                }
+                if (star.x > canvas.width + star.radius) {
+                    star.x = 0 - star.radius;
+                } else if (star.x < 0 - star.radius) {
+                    star.x = canvas.width + star.radius;
+                }
+            });
+        }
+        
+        let animationFrameId = null;
+        function animate() {
+            drawStars();
+            updateStars();
+            animationFrameId = requestAnimationFrame(animate);
+        }
+        
+        // Funzione robusta di inizializzazione e riavvio
+        function initialize() {
+            if (animationFrameId) {
+                cancelAnimationFrame(animationFrameId);
+            }
+            resizeCanvas();
+            initStars();
+            animate();
+        }
+
+        // Listener per il ridimensionamento della finestra
+        window.addEventListener('resize', initialize);
+        
+        // Avvia tutto quando la pagina è caricata
+        window.onload = initialize;
+
+    </script>
+</body>
+</html>
