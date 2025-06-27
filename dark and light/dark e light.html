@@ -1,0 +1,1512 @@
+<!DOCTYPE html>
+ <html lang="it">
+ <head>
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <title>Luce nell'Oscurità - Edizione Definitiva Stellare</title>
+     <script src="https://cdn.tailwindcss.com"></script>
+     <link rel="preconnect" href="https://fonts.googleapis.com">
+     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+     <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Spectral:wght@300;400;600&display=swap" rel="stylesheet">
+     <style>
+        :root {
+            --color-background: #080a13; 
+            --color-text-primary: #e0e5ec; 
+            --color-text-secondary: #b0bdc9; 
+            --color-accent-amber: #f59e0b; 
+            --color-accent-gold: #ffca28; 
+            --color-card-bg: rgba(23, 30, 46, 0.65); 
+            --color-card-border: rgba(251, 191, 36, 0.2); 
+            --color-shadow-amber: rgba(251, 191, 36, 0.25); 
+            --font-titles: 'Cinzel Decorative', cursive; 
+            --font-body: 'Spectral', serif; 
+        }
+
+        html {
+            scroll-behavior: smooth; 
+        }
+
+        body {
+            font-family: var(--font-body);
+            background-color: var(--color-background);
+            color: var(--color-text-primary);
+            overflow-x: hidden; 
+            position: relative;
+        }
+
+        #video-intro-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: #000; 
+            z-index: 10000; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.8s ease-out;
+        }
+
+        #intro-video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; 
+        }
+
+        #skip-intro-btn {
+            position: absolute;
+            bottom: 30px;
+            right: 30px;
+            padding: 10px 20px;
+            background-color: rgba(255, 202, 40, 0.7); 
+            color: var(--color-background);
+            border: none;
+            border-radius: 5px;
+            font-family: var(--font-body);
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            z-index: 10001; 
+        }
+        #skip-intro-btn:hover {
+            background-color: rgba(251, 191, 36, 0.9); 
+        }
+
+        #main-page-content {
+            opacity: 0;
+            transition: opacity 1s ease-in; 
+            pointer-events: none; 
+        }
+        #main-page-content.visible {
+            opacity: 1;
+            pointer-events: auto; 
+        }
+
+
+        #starry-background {
+            position: fixed; 
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -10; 
+            overflow: hidden; 
+        }
+
+        .star {
+            position: absolute;
+            background-color: white;
+            border-radius: 50%;
+            /* L'animazione viene assegnata dinamicamente tramite JavaScript */
+        }
+
+        /* Nuova animazione per un fluttuare e brillare più dolce */
+        @keyframes float-and-twinkle {
+            0% {
+                transform: translateY(0px) translateX(0px);
+                opacity: 0.8;
+            }
+            100% {
+                /* Le variabili --drift-x e --drift-y sono impostate da JS per un movimento casuale */
+                transform: translateY(var(--drift-y)) translateX(var(--drift-x));
+                opacity: 0.2;
+            }
+        }
+
+        .hero-section {
+            min-height: 100vh; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem;
+            position: relative; 
+            
+            background-image: linear-gradient(rgba(8, 10, 19, 0.92), rgba(8, 10, 19, 1)), url('https://placehold.co/1920x1080/0a0f1a/3b4a60?text=Nebulosa+Cosmica+Misteriosa&font=cinzel');
+            background-size: cover; 
+            background-position: center; 
+            background-attachment: fixed; 
+        }
+        .hero-title {
+            font-family: var(--font-titles);
+            font-weight: 900; 
+            color: var(--color-accent-gold);
+            
+            text-shadow: 0 0 12px var(--color-accent-gold), 0 0 22px var(--color-accent-amber), 0 0 35px var(--color-accent-amber);
+            opacity: 0; 
+            transform: translateY(40px) scale(0.95); 
+            animation: heroTextEnter 1.8s 0.2s cubic-bezier(0.23, 1, 0.32, 1) forwards; 
+            font-size: clamp(3rem, 10vw, 7.5rem); 
+            line-height: 1.1;
+            margin-bottom: 1rem;
+        }
+        .hero-subtitle {
+            @apply text-xl md:text-2xl lg:text-3xl max-w-3xl mx-auto; 
+            color: var(--color-text-primary);
+            opacity: 0;
+            transform: translateY(40px);
+            animation: heroTextEnter 1.8s 0.5s cubic-bezier(0.23, 1, 0.32, 1) forwards; 
+        }
+        
+        @keyframes heroTextEnter {
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1); 
+            }
+        }
+
+        .content-section {
+            @apply container mx-auto py-28 md:py-36 px-4; 
+            opacity: 0; 
+            transform: translateY(60px); 
+            transition: opacity 1.2s ease-out, transform 1.2s ease-out; 
+        }
+        .content-section.is-visible {
+            opacity: 1; 
+            transform: translateY(0); 
+        }
+        .section-title {
+            @apply text-5xl sm:text-6xl md:text-7xl font-bold mb-12 md:mb-16 text-center relative;
+            font-family: var(--font-titles); 
+            color: var(--color-accent-gold);
+            padding-bottom: 1.2rem;
+            text-shadow: 0 0 10px var(--color-accent-amber);
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0; 
+            height: 4px;
+            background: linear-gradient(to right, transparent, var(--color-accent-amber), var(--color-accent-gold), var(--color-accent-amber), transparent);
+            border-radius: 2px;
+            transition: width 1s cubic-bezier(0.68, -0.55, 0.27, 1.55) 0.4s; 
+        }
+        .content-section.is-visible .section-title::after {
+            width: 180px; 
+        }
+
+        .custom-card {
+            
+            @apply bg-slate-800/60 backdrop-blur-lg p-6 md:p-8 rounded-xl shadow-2xl transition-all duration-400 ease-out flex flex-col;
+            border: 1px solid var(--color-card-border);
+            opacity: 0; 
+            transform: perspective(800px) rotateY(15deg) scale(0.9); 
+            animation: cardEnterAnimation 0.8s cubic-bezier(0.23, 1, 0.32, 1) forwards; 
+        }
+        
+        .content-section.is-visible .grid .custom-card:nth-child(1) { animation-delay: 0.4s; }
+        .content-section.is-visible .grid .custom-card:nth-child(2) { animation-delay: 0.6s; }
+        .content-section.is-visible .grid .custom-card:nth-child(3) { animation-delay: 0.8s; }
+        .content-section.is-visible .grid .custom-card:nth-child(4) { animation-delay: 1.0s; }
+        .content-section.is-visible .grid .custom-card:nth-child(5) { animation-delay: 1.2s; }
+        .content-section.is-visible .grid .custom-card:nth-child(6) { animation-delay: 1.4s; }
+        .content-section.is-visible .grid .custom-card:nth-child(7) { animation-delay: 1.6s; }
+        .content-section.is-visible .grid .custom-card:nth-child(8) { animation-delay: 1.8s; }
+        .content-section.is-visible .grid .custom-card:nth-child(9) { animation-delay: 2.0s; }
+        .content-section.is-visible .grid .custom-card:nth-child(10) { animation-delay: 2.2s; }
+        .content-section.is-visible .grid .custom-card:nth-child(11) { animation-delay: 2.4s; }
+        .content-section.is-visible .grid .custom-card:nth-child(12) { animation-delay: 2.6s; }
+
+
+        
+        @keyframes cardEnterAnimation {
+            to {
+                opacity: 1;
+                transform: perspective(800px) rotateY(0deg) scale(1); 
+            }
+        }
+        
+        .custom-card:hover {
+            transform: translateY(-12px) scale(1.03); 
+            box-shadow: 0 25px 50px -10px rgba(0,0,0,0.5), 0 0 35px var(--color-shadow-amber); 
+            border-color: var(--color-accent-gold); 
+        }
+        .card-title {
+            @apply text-2xl font-bold mb-3;
+            font-family: var(--font-titles); 
+            color: var(--color-accent-gold);
+        }
+        .card-text {
+            @apply text-base leading-relaxed;
+            color: var(--color-text-secondary);
+        }
+        .data-label {
+            @apply font-semibold;
+            color: var(--color-accent-amber);
+        }
+
+        .animated-image {
+            @apply rounded-lg shadow-lg transition-all duration-500 ease-out;
+            opacity: 0; 
+            transform: scale(0.9) rotate(-3deg); 
+        }
+        .content-section.is-visible .animated-image {
+            opacity: 1; 
+            transform: scale(1) rotate(0deg); 
+        }
+        .animated-image:hover {
+            transform: scale(1.06) rotate(1deg); 
+            box-shadow: 0 12px 35px rgba(0,0,0,0.35);
+        }
+
+        .story-block-wrapper {
+             @apply max-w-4xl mx-auto; 
+        }
+        .story-block {
+            @apply bg-slate-800/60 backdrop-blur-lg p-8 md:p-10 lg:p-12 rounded-2xl shadow-2xl border border-slate-700/60;
+            opacity: 0;
+            transform: translateY(50px);
+            animation: cardEnterAnimation 0.8s ease-out forwards; 
+        }
+        .content-section.is-visible .story-block { animation-delay: 0.4s; }
+        .story-block h3, .story-block h4 { 
+            font-family: var(--font-titles);
+            color: var(--color-accent-gold);
+            text-shadow: 0 0 5px var(--color-accent-amber);
+        }
+        .story-block h3 { @apply text-3xl md:text-4xl font-semibold mt-10 mb-6; }
+        .story-block h4 { @apply text-2xl md:text-3xl font-semibold mt-8 mb-4; }
+
+        .story-block p, .story-block ul {
+            @apply mb-6 text-lg;
+        }
+        .story-block ul { @apply list-none pl-0; } 
+        .story-block li { @apply p-6 bg-slate-700/30 rounded-lg shadow-md border border-slate-600/40 mb-4; } 
+        .story-block li strong { @apply text-xl text-amber-300 block mb-2; }
+
+
+        .faction-flag-link { 
+            @apply flex flex-col items-center; 
+            text-decoration: none; 
+            cursor: pointer; 
+        }
+        .faction-flag {
+             @apply border-2 border-amber-500/40 rounded-lg overflow-hidden transition-all duration-300 ease-out; 
+             width: 100px;
+             height: 150px;
+             object-fit: contain; 
+             box-shadow: 0 0 12px rgba(251, 191, 36, 0.15);
+         }
+         .faction-flag-link:hover .faction-flag { 
+            transform: scale(1.15) rotate(2deg); 
+            box-shadow: 0 0 30px var(--color-shadow-amber);
+            border-color: var(--color-accent-gold);
+         }
+        .faction-flag-caption { 
+            @apply mt-3 text-center; 
+        }
+
+        .bestiary-img-vertical { 
+            @apply w-full h-96 object-cover rounded-lg mb-4;
+         }
+         .bestiary-img-standard { 
+            @apply w-full h-72 object-cover rounded-lg mb-4;
+         }
+         .ability-card-image { 
+            @apply w-full h-56 object-cover rounded-lg mb-4;
+        }
+        #magic-particles-container { 
+            position: relative;
+            width: 100%;
+            height: 250px;
+            overflow: hidden;
+            border-radius: 0.5rem;
+            margin-top: 1.5rem;
+        }
+        #hero-particles.mana-particles-container { 
+             position: absolute;
+             top: 0; left: 0; width: 100%; height: 100%;
+             z-index: 0; 
+        }
+        .mana-particle { 
+            position: absolute;
+            background-color: #5fa8d3; 
+            border-radius: 50%;
+            opacity: 0;
+            animation-name: floatManaParticle;
+            animation-timing-function: ease-in-out;
+            animation-iteration-count: infinite;
+            box-shadow: 0 0 5px #5fa8d3, 0 0 8px #79c2f3, 0 0 12px #addcff; 
+        }
+        
+        @keyframes floatManaParticle {
+            0% { transform: translateY(15vh) translateX(0vw) scale(0.4); opacity: 0; }
+            20% { opacity: 0.7; transform: scale(0.6); }
+            50% { transform: translateY(-15vh) translateX(calc(4vw * var(--direction-x, 1))) scale(1); opacity: 0.4; }
+            80% { opacity: 0.7; transform: scale(0.6); }
+            100% { transform: translateY(15vh) translateX(calc(8vw * var(--direction-x, 1))) scale(0.4); opacity: 0; }
+        }
+
+        .map-container { 
+            @apply relative w-full max-w-3xl mx-auto rounded-lg overflow-hidden shadow-2xl;
+        }
+        .map-pin { 
+            @apply absolute w-5 h-5 rounded-full transform -translate-x-1/2 -translate-y-1/2 cursor-pointer;
+            background-color: transparent; 
+        }
+        .map-pin:hover {
+            
+        }
+        .map-pin .tooltip { 
+            @apply absolute bottom-full left-1/2 transform -translate-x-1/2 mb-4 px-3 py-1.5 bg-slate-900/90 text-white text-sm rounded-md whitespace-nowrap opacity-0 transition-all duration-300 pointer-events-none max-w-xs;
+            transform-origin: bottom center; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+            overflow-wrap: break-word; 
+        }
+        .map-pin:hover .tooltip {
+            opacity: 1; 
+            transform: translateX(-50%) translateY(-8px); 
+        }
+        
+        .runic-table-wrapper {
+            @apply max-w-4xl mx-auto mt-8;
+        }
+        .runic-table {
+            @apply w-full text-sm text-left text-gray-300 border-collapse;
+        }
+        .runic-table th, .runic-table td {
+            @apply px-4 py-3 border border-slate-700;
+        }
+        .runic-table th {
+            @apply bg-slate-700/50 text-amber-300 font-semibold uppercase tracking-wider;
+        }
+        .runic-table .rune-symbol {
+            @apply text-2xl md:text-3xl text-amber-400 font-normal;
+             font-family: 'Arial', sans-serif; 
+        }
+        .rune-category-titanic { @apply text-sky-400; } 
+        .rune-category-cardiale { @apply text-rose-400; }
+        .rune-category-neutro { @apply text-slate-400; }
+
+        .back-to-flags-btn-container { 
+            @apply text-center mt-16 mb-8; 
+        }
+        .back-to-flags-btn {
+            @apply inline-block px-10 py-4 text-slate-900 font-bold rounded-lg transition-all duration-300 ease-in-out text-xl shadow-lg hover:shadow-2xl;
+            background-color: var(--color-accent-gold);
+            border: 2px solid var(--color-accent-amber);
+            font-family: var(--font-titles);
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.25);
+        }
+        .back-to-flags-btn:hover {
+            text-decoration: none;
+            transform: translateY(-4px) scale(1.05);
+            background-color: var(--color-accent-amber);
+            color: var(--color-background);
+            border-color: var(--color-accent-gold);
+            box-shadow: 0 10px 20px var(--color-shadow-amber);
+        }
+
+        /* Chatbot Styles */
+        #chat-toggle-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: var(--color-accent-amber);
+            color: var(--color-background);
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+            z-index: 9990;
+            opacity: 0; 
+            pointer-events: none; 
+            transition: opacity 0.5s ease-in-out 0.5s, transform 0.3s ease, background-color 0.3s ease; 
+        }
+        #chat-toggle-btn:hover {
+            transform: scale(1.1);
+            background-color: var(--color-accent-gold);
+        }
+
+        #chat-widget {
+            position: fixed;
+            bottom: 90px;
+            right: 20px;
+            width: 350px;
+            max-width: 90vw;
+            height: 500px;
+            max-height: 70vh;
+            background-color: var(--color-card-bg);
+            border: 1px solid var(--color-card-border);
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+            z-index: 9989;
+            opacity: 0;
+            transform: translateY(20px) scale(0.95);
+            transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+            pointer-events: none;
+        }
+        #chat-widget.visible {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            pointer-events: auto;
+        }
+
+        .chat-header {
+            @apply p-4 border-b border-slate-700 flex justify-between items-center;
+            background-color: rgba(10, 10, 26, 0.9);
+            border-top-left-radius: 12px;
+            border-top-right-radius: 12px;
+        }
+        .chat-header h3 {
+            font-family: var(--font-titles);
+            color: var(--color-accent-gold);
+            font-size: 1.4rem;
+            margin: 0;
+        }
+        #chat-close-btn {
+            background: none;
+            border: none;
+            color: var(--color-text-secondary);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        #chat-close-btn:hover {
+            color: var(--color-text-primary);
+        }
+
+        .chat-messages {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        .chat-message {
+            padding: 0.6rem 1rem;
+            border-radius: 8px;
+            max-width: 85%;
+            word-wrap: break-word;
+            line-height: 1.5;
+        }
+        .chat-message.user {
+            background-color: var(--color-accent-amber);
+            color: var(--color-background);
+            align-self: flex-end;
+            border-bottom-right-radius: 0;
+        }
+        .chat-message.bot {
+            background-color: rgba(45, 55, 72, 0.9); 
+            color: var(--color-text-primary);
+            align-self: flex-start;
+            border-bottom-left-radius: 0;
+        }
+        .chat-message.loading {
+            align-self: flex-start;
+        }
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+        }
+        .typing-indicator span {
+            height: 8px;
+            width: 8px;
+            margin: 0 2px;
+            background-color: var(--color-text-secondary);
+            border-radius: 50%;
+            display: inline-block;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+        .typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
+        .typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1.0); }
+        }
+
+
+        .chat-input-area {
+            @apply p-3 border-t border-slate-700 flex items-center gap-2;
+            background-color: rgba(10, 10, 26, 0.9);
+            border-bottom-left-radius: 12px;
+            border-bottom-right-radius: 12px;
+        }
+        #chat-input {
+            @apply flex-grow p-2 rounded-md border border-slate-600 bg-slate-700 text-white placeholder-slate-400 focus:ring-amber-500 focus:border-amber-500;
+        }
+        #chat-send-btn {
+            @apply p-2 bg-amber-500 hover:bg-amber-600 text-slate-900 rounded-md font-semibold transition-colors;
+        }
+
+        /* Stili per la sezione Riflessione */
+        #riflessione-rain .story-block {
+            border: 2px solid var(--color-accent-gold); 
+            box-shadow: 0 0 25px var(--color-shadow-amber), inset 0 0 15px rgba(251, 191, 36, 0.15); 
+            padding-top: 2rem; 
+            padding-bottom: 2rem; 
+        }
+         #riflessione-rain .section-title { 
+            @apply !text-6xl sm:!text-7xl md:!text-8xl; 
+        }
+
+        /* Pulsante Musica Icona */
+        #music-toggle-btn-icon {
+            position: fixed;
+            bottom: 20px;
+            left: 20px; 
+            background-color: var(--color-accent-amber);
+            color: var(--color-background);
+            width: 50px; 
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+            z-index: 9990;
+            opacity: 0; 
+            pointer-events: none; 
+            transition: opacity 0.5s ease-in-out 0.5s, transform 0.3s ease, background-color 0.3s ease;
+        }
+        #music-toggle-btn-icon:hover {
+            transform: scale(1.1);
+            background-color: var(--color-accent-gold);
+        }
+        #music-toggle-btn-icon svg {
+            width: 24px; 
+            height: 24px;
+        }
+
+        /* Media Query per Mobile */
+        @media (max-width: 767px) {
+            #video-intro-container {
+                display: none !important;
+            }
+            #main-page-content {
+                opacity: 1 !important;
+                pointer-events: auto !important;
+                transition: none !important; 
+            }
+            #chat-toggle-btn,
+            #music-toggle-btn-icon {
+                opacity: 1 !important;
+                pointer-events: auto !important;
+                transition: none !important; 
+            }
+             #chat-widget { 
+                bottom: 80px; 
+                right: 10px;
+                left: 10px;
+                width: auto; 
+                max-width: calc(100vw - 20px);
+            }
+        }
+
+
+     </style>
+ </head>
+ <body class="antialiased">
+    <div id="video-intro-container">
+        <!-- MODIFICA: URL del video aggiornato -->
+        <video id="intro-video" src="https://dl.dropboxusercontent.com/scl/fi/95zpz48rc65vfdhyxg28w/ERON_COPERTINA.mp4?rlkey=zx7p5fkg7pbbjampqy1we3ope&st=je6zu0fu&dl=0" autoplay muted playsinline>
+            Il tuo browser non supporta il tag video. Assicurati di usare un browser moderno o prova a caricare il video su una piattaforma differente.
+        </video>
+        <button id="skip-intro-btn">Salta Introduzione</button>
+    </div>
+
+    <!-- Il contenitore principale per la pagina e le stelle -->
+    <div id="main-page-content">
+        <!-- Contenitore per lo sfondo stellato, posizionato dietro a tutto -->
+        <div id="starry-background"></div>
+
+        <header class="hero-section">
+            <div class="mana-particles-container" id="hero-particles"></div>
+            <div class="hero-content-wrapper">
+                <div class="hero-title-container">
+                    <h1 class="hero-title">Luce nell'Oscurità</h1>
+                </div>
+                <p class="hero-subtitle">Un viaggio epico attraverso il mondo di Eron, tra eroi, antiche magie e l'eterna lotta tra luce e tenebre.</p>
+            </div>
+        </header>
+
+        <main class="py-16 px-4 md:px-8 relative z-10">
+            <!-- Tutte le sezioni del contenuto della pagina vanno qui -->
+            <section id="origini" class="content-section">
+                <h2 class="section-title">Origini del Mondo</h2>
+                <div class="story-block-wrapper">
+                    <div class="content-text story-block">
+                        <h4 class="text-3xl font-semibold mb-3 text-amber-200">Anno 0: La Creazione di Eron</h4>
+                        <p>Noxar, il Fabbricatore della Realtà, fu il primo Titano a emergere dal Vuoto Primordiale. Dalla sua volontà presero forma la materia e le leggi fondamentali dell’universo. Subito dopo, apparve Viraya, la Madre Selvaggia, che infuse la vita nel creato, e Vultar, il Signore degli Elementi, che donò al mondo forma e movimento. Sebbene i tre Titani agissero in perfetta armonia, fu la visione di Noxar a plasmare per prima il destino del mondo, diventando così il pilastro invisibile attorno al quale ruota l'intera esistenza.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="regnum-aeterna" class="content-section">
+                <h2 class="section-title">Il Regno di Anor</h2>
+                <div class="text-center mb-12">
+                    <p class="content-text max-w-3xl mx-auto">Al centro del continente di Eron si estende il Regno di Anor, un reame antico, segnato dalle cicatrici di guerre passate e dalla minaccia incombente della tirannia. Tutte le grandi capitali e gli insediamenti minori qui descritti, se non diversamente specificato, si trovano entro i suoi vasti confini, un territorio che abbraccia una moltitudine di paesaggi e culture.</p>
+                </div>
+
+                <div class="map-container mb-16">
+                    <img src="https://i.postimg.cc/qMLm2ZkF/Regnum-Anor.png" alt="[Immagine della Mappa Dettagliata del Regno di Anor]" class="w-full h-auto rounded-lg shadow-2xl animated-image">
+                    <div class="map-pin" style="top: 25%; left: 40%;">
+                        <span class="tooltip">
+                            <strong class="block text-amber-400">Solennar (Umani)</strong>
+                            Capitale umana circondata da mura dorate.
+                        </span>
+                    </div>
+                    <div class="map-pin" style="top: 50%; left: 20%;">
+                        <span class="tooltip">
+                            <strong class="block text-amber-400">Elarindor (Elfi)</strong>
+                            Dimora elfica in una foresta magica.
+                        </span>
+                    </div>
+                    <div class="map-pin" style="top: 15%; left: 15%;">
+                        <span class="tooltip">
+                            <strong class="block text-amber-400">Vareth-Nox (Demoni)</strong>
+                            Reggia dei demoni su un altopiano vulcanico.
+                        </span>
+                    </div>
+                    <div class="map-pin" style="top: 35%; left: 30%;">
+                        <span class="tooltip">
+                            <strong class="block text-amber-400">Aerisly (Popoli Misti)</strong>
+                            Città-stato multiculturale e neutrale.
+                        </span>
+                    </div>
+                    <div class="map-pin" style="top: 70%; left: 10%;">
+                        <span class="tooltip">
+                            <strong class="block text-amber-400">Drokh-Mar (Orchi)</strong>
+                            Fortezza orchesca nella roccia lavica.
+                        </span>
+                    </div>
+                    <div class="map-pin" style="top: 80%; left: 85%;">
+                        <span class="tooltip">
+                            <strong class="block text-amber-400">Nyxthar (Fortezza di Velkrath)</strong> L'oscura fortezza del dio della corruzione.
+                        </span>
+                    </div>
+                </div>
+
+                <h3 class="text-4xl font-bold mb-10 text-center text-amber-300" style="font-family: var(--font-titles);">Le Grandi Città e le Roccaforti di Anor</h3>
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-12">
+                    <!-- Grandi Capitali -->
+                    <div class="custom-card">
+                        <h4 class="card-title">Solennar (Umani)</h4>
+                        <div class="card-content">
+                            <p><span class="data-label">Culto Principale:</span> Culto della Fiamma Aurica (85-95% aderenti).</p>
+                            <p><span class="data-label">Credenze:</span> Non venerano il Sole fisico, ma la "Fiamma Aurica", manifestazione metafisica di speranza e rigenerazione. Il Re è il “Custode della Luce”, un garante del suo equilibrio.</p>
+                            <p><span class="data-label">Popolazione Stimata:</span> 150.000 - 250.000.</p>
+                            <p><span class="data-label">Composizione:</span> Prevalentemente Umani, con piccole comunità di semi-umani.</p>
+                        </div>
+                    </div>
+                    <div class="custom-card">
+                        <h4 class="card-title">Elarindor (Elfi)</h4>
+                        <div class="card-content">
+                            <p><span class="data-label">Culto Principale:</span> Sussurri del Mana (90-98% aderenti).</p>
+                            <p><span class="data-label">Credenze:</span> Venerano l'essenza stessa del Mana, che permea ogni cosa. Il Re è il suo messaggero terreno.</p>
+                            <p><span class="data-label">Popolazione Stimata:</span> 50.000 - 80.000.</p>
+                            <p><span class="data-label">Composizione:</span> Quasi esclusivamente Elfi.</p>
+                        </div>
+                    </div>
+                    <div class="custom-card">
+                        <h4 class="card-title">Vareth-Nox (Demoni)</h4>
+                        <div class="card-content">
+                            <p><span class="data-label">Filosofia:</span> Gerarchia d'Ossidiana (maggioranza aderente).</p>
+                            <p><span class="data-label">Dettagli:</span> Sebbene la maggior parte segua la Gerarchia, una fazione interna, la "Frattura Cremisi", ne contesta la supremazia, generando tensioni e lotte di potere.</p>
+                            <p><span class="data-label">Popolazione Stimata:</span> 80.000 - 150.000.</p>
+                            <p><span class="data-label">Composizione:</span> Varie caste di Demoni, con una rigida struttura sociale.</p>
+                        </div>
+                    </div>
+                    <div class="custom-card">
+                        <h4 class="card-title">Aerisly (Popoli Misti)</h4>
+                        <div class="card-content">
+                            <p><span class="data-label">Culto Principale:</span> Grazia della Sovrana (70-85% aderenti).</p>
+                            <p><span class="data-label">Credenze:</span> Venerano la Regina come simbolo vivente di libertà, unità e prosperità.</p>
+                            <p><span class="data-label">Popolazione Stimata:</span> 100.000 - 180.000.</p>
+                            <p><span class="data-label">Composizione:</span> Estremamente varia (mezzelfi, mezzorchi, nani, umani, ecc.).</p>
+                        </div>
+                    </div>
+                    <div class="custom-card">
+                        <h4 class="card-title">Drokh-Mar (Orchi)</h4>
+                        <div class="card-content">
+                            <p><span class="data-label">Filosofia:</span> La Legge del più Forte.</p>
+                            <p><span class="data-label">Credenze:</span> Tradizionalmente senza dèi, ma alcuni clan giovani seguono antichi spiriti della guerra, scatenando conflitti interni e sfidando la vecchia legge.</p>
+                            <p><span class="data-label">Popolazione Stimata:</span> 60.000 - 100.000.</p>
+                            <p><span class="data-label">Composizione:</span> Orchi appartenenti a numerosi clan.</p>
+                        </div>
+                    </div>
+                    <div class="custom-card">
+                        <h4 class="card-title">Nyxthar (Dominio di Velkrath)</h4>
+                        <div class="card-content">
+                            <p><span class="data-label">Culto:</span> Dominio Corrotto.</p>
+                            <p><span class="data-label">Credenze:</span> Religione basata su schiavitù e venerazione di Velkrath. Tuttavia, non tutti lo servono per fede: una setta segreta, "Gli Incatenati", trama nell'ombra per abbatterlo.</p>
+                            <p><span class="data-label">Popolazione Stimata:</span> Decine di migliaia.</p>
+                            <p><span class="data-label">Composizione:</span> Miscuglio di umani corrotti, orchi, demoni e bestie mutate.</p>
+                        </div>
+                    </div>
+                     <!-- Insediamenti Minori -->
+                     <div class="custom-card">
+                        <h4 class="card-title">Hellspine (Villaggio)</h4>
+                        <div class="card-content">
+                            <p><span class="data-label">Culto:</span> Fede del Sole Morente (culto rurale e apocalittico basato sul sacrificio e la purificazione tramite fuoco).</p>
+                            <p><span class="data-label">Popolazione (pre-attacco):</span> 300 - 800.</p>
+                            <p><span class="data-label">Composizione:</span> Prevalentemente Umani.</p>
+                            <p class="card-text italic mt-1">Villaggio natale di Rain, distrutto da Velkrath.</p>
+                        </div>
+                    </div>
+                    <div class="custom-card">
+                        <h4 class="card-title">Boscopiano (Villaggio)</h4>
+                        <div class="card-content">
+                            <p><span class="data-label">Culto:</span> Concordato Verde (un ibrido pragmatico tra devozione solare e antichi spiriti della natura).</p>
+                            <p><span class="data-label">Popolazione Stimata:</span> 1.000 - 3.000.</p>
+                            <p><span class="data-label">Composizione:</span> Umani, con minoranze di semi-umani/elfi.</p>
+                            <p class="card-text italic mt-1">Prospero villaggio agricolo e forestale.</p>
+                        </div>
+                    </div>
+                    <div class="custom-card">
+                        <h4 class="card-title">Plumaris</h4>
+                        <div class="card-content">
+                            <p><span class="data-label">Cultura:</span> Incentrata sui grifoni.</p>
+                            <p><span class="data-label">Popolazione Stimata:</span> 2.000 - 5.000.</p>
+                            <p><span class="data-label">Composizione:</span> Umani e/o Elfi, o una razza adattata all'alta quota.</p>
+                            <p class="card-text italic mt-1">Famoso per i suoi grifoni e le loro piume preziose.</p>
+                        </div>
+                    </div>
+                    <div class="custom-card">
+                        <h4 class="card-title">Pozzo di Erebos</h4>
+                        <div class="card-content">
+                            <p><span class="data-label">Cultura:</span> Legge della sopravvivenza.</p>
+                            <p><span class="data-label">Popolazione:</span> Migliaia di prigionieri e guardiani.</p>
+                            <p><span class="data-label">Composizione:</span> Varia (prigionieri di ogni razza).</p>
+                            <p class="card-text italic mt-1">Un'oscura arena-prigione a più livelli, da cui fuggì l'eroe Zahrak.</p>
+                        </div>
+                    </div>
+                    <div class="custom-card">
+                        <h4 class="card-title">Torre Estrea</h4>
+                        <div class="card-content">
+                            <p><span class="data-label">Popolazione:</span> Incerta e misteriosa.</p>
+                            <p><span class="data-label">Composizione:</span> Saggi, mistici, guardiani o nessuno.</p>
+                             <p class="card-text italic mt-1">Avvolta nel mistero. Alcuni parlano di dozzine di custodi astrali, altri la descrivono come vuota, animata da una coscienza invisibile. Nessuno sa con certezza chi o cosa la abiti.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="storia" class="content-section">
+                <h2 class="section-title">La Storia di Eron</h2>
+                <div class="story-block-wrapper">
+                    <div class="story-block">
+                        <p class="content-text mb-6">La storia di Eron è un arazzo intessuto di creazione divina, ascesa mortale, epoche di oscurità e barlumi di speranza. Ogni era ha lasciato il suo segno, plasmando il destino dei suoi abitanti e preparando il terreno per le sfide a venire.</p>
+
+                        <h4>Anno 60 - L'Era degli Eroi e la Nascita dei Regni</h4>
+                        <p class="content-text mb-6">Dopo la creazione di Eron, in un'epoca in cui il mondo era ancora selvaggio e senza equilibrio, un gruppo di avventurieri straordinari si erse per riportare l'ordine. Le loro imprese divennero leggenda: **Tharion il Redentore** (Umano) spezzò la Maledizione dei Cinque Inverni; **Faelar della Chioma d’Argento** (Elfo) evocò la Foresta che Cammina; **Lirith la Mezzanotte** (Demone) tradì la Gerarchia d'Ossidiana per salvare un'intera città; e **Zahrak l’Inquieto** (Orco) ruppe le catene del Pozzo di Erebos. Raggiunto un potere quasi divino, divennero i primi, immortali sovrani dei loro popoli, fondando nell'Anno 60 le grandi capitali che ancora oggi dominano il paesaggio: Re Tharion fondò Solennar, Re Faelar prese il trono di Elarindor e il Capoguerra Zahrak unì i clan a Drokh-Mar.</p>
+
+                        <h4>Ere Antiche - La Prima Tirannia di Velkrath</h4>
+                        <p class="content-text mb-6">Molto prima degli eventi che avrebbero scosso l'Epoca Cremisi, un'ombra si allungò su Eron. Velkrath, un tempo un Titano minore di nome Uzh-Gar, fu corrotto dal suo stesso desiderio di dominio assoluto. Dopo essersi rivoltato contro i suoi pari, fu scacciato e, nei secoli, la sua essenza si mutò nelle profondità di Nyxthar, rinascendo come il Dio della Tirannia. Per un tempo imprecisato, il suo regno di terrore oppresse i popoli liberi, finché un'alleanza di eroi leggendari riuscì a sconfiggerlo e a imprigionarlo nelle profondità più oscure del mondo.</p>
+
+                        <div class="my-10 py-8 border-y-4 border-amber-600/30 shadow-inner shadow-amber-500/20 rounded-lg">
+                            <h4 class="text-3xl md:text-4xl font-bold mt-2 mb-6 text-red-400 text-center" style="text-shadow: 0 0 8px rgba(220, 38, 38, 0.7);">L'Epoca Cremisi</h4>
+                            <p class="content-text text-center italic mb-8 text-amber-200">(Anni 65 - 100 dell'Era Attuale)</p>
+                            <p class="content-text text-lg text-center mb-8 max-w-3xl mx-auto">Appena cinque anni dopo la fondazione delle grandi capitali, Eron fu travolta da una serie di cataclismi e guerre devastanti. Questo periodo turbolento, noto come l'Epoca Cremisi, durò 35 lunghi e sanguinosi anni, mettendo a dura prova la resilienza di ogni razza:</p>
+                            <ul class="list-none space-y-8 text-lg text-gray-200 mb-6 max-w-3xl mx-auto">
+                                <li class="p-6 bg-slate-700/50 rounded-xl shadow-xl border border-slate-600/60 hover:border-red-500/70 transition-all duration-300"><strong class="text-red-300 block mb-2 text-2xl">Orchi vs Demoni:</strong> Una brutale guerra per il dominio di terre ricche di risorse vide gli Orchi di Drokh-Mar scontrarsi con le legioni demoniache di Vareth-Nox. Dopo decenni di conflitto, gli orchi furono infine sconfitti, subendo pesanti perdite e perdendo vaste terre a causa delle strategie ritenute vigliacche dai demoni. Questo evento rafforzò l'odio degli orchi verso i demoni.</li>
+                                <li class="p-6 bg-slate-700/50 rounded-xl shadow-xl border border-slate-600/60 hover:border-red-500/70 transition-all duration-300"><strong class="text-red-300 block mb-2 text-2xl">Il Flagello del Crimson Flux:</strong> Una misteriosa e letale malattia, il "Crimson Flux", si diffuse tra le popolazioni umane. La disperazione regnava, finché un giorno, in un evento miracoloso, fu la Fiamma Aurica stessa, con uno splendore mai visto prima, a purificare l'aria e dissolvere il morbo. Questo evento consolidò il culto e rafforzò la resilienza umana. Tuttavia, il morbo non fu completamente distrutto, ma solo contenuto, e tracce dormienti sopravvivono ancora nel mondo.</li>
+                                <li class="p-6 bg-slate-700/50 rounded-xl shadow-lg border border-slate-600/50 hover:border-red-500/70 transition-all duration-300"><strong class="text-red-300 block mb-2 text-2xl">Il Tradimento Elfico:</strong> Nelle foreste di Elarindor, il re dell'epoca, consumato dalla brama di potere, cercò di assorbire per sé tutta l'essenza del Mana. Questo atto sacrilego provocò uno squilibrio catastrofico, e la foresta stessa si rivoltò contro i suoi figli. L'equilibrio fu ristabilito solo con la morte del re traditore per mano di eroi elfici, spianando la strada per l'ascesa al trono di Faelar.</li>
+                            </ul>
+                            <p class="content-text text-lg text-center mt-8">L'Epoca Cremisi si concluse nell'anno 100, lasciando Eron profondamente segnata, ma con la promessa di una nuova alba.</p>
+                        </div>
+
+                        <h4>Anno 100 - L'Avvento dell'Epoca d'Argento</h4>
+                        <p class="content-text mb-6">La fine dell'Epoca Cremisi segnò l'inizio di un'era di ricostruzione e innovazione. In questo periodo cruciale, le antiche rune dei Primordiali furono riscoperte, svelando nuovi segreti sulla magia. L'Anno 100 vide anche la nascita di un nuovo faro di speranza: stanca delle politiche divisive, l'eroina ibrida **Maenya "la Frattura" Thorne**, che aveva sigillato la Faglia di Fiamma Inversa, fondò la città-stato di Aerisly, un rifugio dove le differenze non contassero. Le altre potenze, logore dai conflitti, accettarono la sua esistenza, riconoscendone la neutralità e lo spirito di unione. Questo evento segnò l'inizio di un nuovo equilibrio di poteri.</p>
+
+                        <h4>Anno 115 - Un Barlume di Luce e il Ritorno dell'Ombra</h4>
+                        <p class="content-text mb-6">Nel cuore dell'Epoca d'Argento, nell'anno 115, in un istante che scosse le fondamenta del destino, nacque Rain. Esattamente in quell'istante, le antiche catene che imprigionavano Velkrath si spezzarono. Gli oracoli parlavano di un “Figlio del Crepuscolo”, la cui esistenza avrebbe spezzato l'equilibrio tra Luce e Oscurità. Legati come due estremi della stessa fiamma, Rain e Velkrath erano destinati a scontrarsi, e il Dio della Tirannia iniziò a radunare le sue forze a Nyxthar.</p>
+
+                        <h4>Anno 133 - Amicizia e Amore a Hellspine</h4>
+                        <p class="content-text mb-6">Nell'anno 133, Rain (18 anni) strinse un'inseparabile amicizia con Ridran, un ladro dal passato difficile. La loro lealtà fu cementata da numerous prove: insieme salvarono un bambino da un incendio, sfidarono un corrotto signorotto locale e difesero Hellspine da un branco di bestie. In quegli anni, Rain conobbe anche Valenya, la figlia del fabbro. Sagace e devota alla Fede del Sole Morente, Valenya fu la prima a vedere in Rain non solo un cuore gentile, ma il potenziale per qualcosa di più grande, e i due si innamorarono.</p>
+                        
+                        <h4>Anno 136 - La Caduta di Hellspine</h4>
+                        <p class="content-text mb-6">Tre anni dopo, Velkrath, avendo percepito la presenza del "Figlio del Crepuscolo", scatenò le sue forze su Hellspine, un punto debole nella rete magica di Eron. Durante l'attacco, Rain (21 anni) perse tutto: i suoi genitori, la sua amata Valenya, la sua casa e la sua innocenza. Separato da Ridran, fu catturato e soggiogato da Velkrath, che lo trasformò nel suo campione.</p>
+
+                        <h4>Anni 136-142 - I Sei Anni d'Ombra e la Liberazione</h4>
+                        <p class="content-text mb-6">Per sei lunghi anni, Rain fu costretto a servire il male. Nel frattempo, Ridran, dopo una disperata ricerca e con l'aiuto di un misterioso evocatore delle Ombre Bianche, trovò il modo di infiltrarsi a Nyxthar. Riuscì infine a liberare Rain, spezzando parte del vincolo oscuro che lo teneva prigioniero. È qui, nell'anno 142 (Rain ha 27 anni), che la nostra storia ha inizio. Tormentato e diviso, Rain intraprende un arduo cammino per distruggere Velkrath, fare pace con la propria oscurità interiore e salvare Eron dalla tirannia.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="rain-niar" class="content-section">
+                <h2 class="section-title !text-5xl sm:!text-6xl md:!text-7xl">Rain e Niar: L'Eroe Spezzato</h2>
+                <div class="max-w-4xl mx-auto custom-card">
+                    <div class="flex flex-col md:flex-row items-center gap-10">
+                        <img src="https://i.postimg.cc/bJ5RmKGy/rain.jpg" alt="[Immagine di Rain, un giovane paladino dall'aspetto tormentato]" class="rounded-lg shadow-xl w-full md:w-2/5 object-cover animated-image" style="max-height: 500px;">
+                        <div class="md:w-3/5">
+                           <h3 class="card-title text-3xl mb-4">Un'Anima Divisa</h3>
+                            <p class="content-text">Rain era un giovane paladino cresciuto a Hellspine, animato da ideali di giustizia. Tuttavia, ha sempre represso la sua rabbia interiore, un fuoco scatenato dall'ingiustizia, per timore di non essere degno.</p>
+                            <p class="content-text">Quando Velkrath distrusse tutto ciò che amava, Rain fu sconfitto e schiavizzato. Per sei anni, il dio tiranno lo sottopose a torture mentali, facendogli rivivere la morte di Valenya ogni giorno. Alla fine, la sua rabbia repressa prese forma e Velkrath vi infuse una scintilla di anima corrotta, creando Niar, un'Ombra Vivente nata dal dolore e dalla collera.</p>
+                            <p class="content-text">Niar non è puramente malvagio: è la parte di Rain che è sempre stata negata. Alimentato dall'odio e dalla manipolazione di Velkrath, diventa un nemico interiore difficile da contenere. Inoltre, nel sangue di Rain scorrono tracce dormienti del Crimson Flux, ereditate dalla madre, un potere pericoloso che potrebbe riemergere, legandosi alla sua lotta con Niar.</p>
+                            <p class="content-text">Liberato da Ridran, Rain deve ora affrontare la sua vera battaglia: quella contro se stesso. Per diventare completo e veramente libero, non può distruggere Niar, ma deve accettarlo e trovare un equilibrio tra la luce e l'oscurità che albergano in lui.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+           <section id="abilita-rain" class="content-section">
+               <h2 class="section-title">Le Abilità di Rain</h2>
+               <div class="grid md:grid-cols-3 gap-10 max-w-6xl mx-auto">
+                   <div class="custom-card">
+                       <img src="https://i.postimg.cc/D07SR45y/image.png" alt="[Immagine di Fiamme controllate da una figura eroica]" class="ability-card-image animated-image">
+                       <h3 class="card-title mt-4">Dominio Elementale: Il Fuoco Interiore</h3>
+                       <p class="card-text">Rain è un "Dotato" con una profonda affinità per il controllo delle fiamme. La sua capacità non è solo distruttiva, ma può anche manifestarsi come luce purificatrice o scudo ardente, riflettendo il suo spirito da paladino.</p>
+                   </div>
+                   <div class="custom-card">
+                       <img src="https://i.postimg.cc/PxbqTfF3/image.png" alt="[Immagine di Un'aura oscura e potente che si fonde con una luce]" class="ability-card-image animated-image">
+                       <h3 class="card-title mt-4 text-purple-400">Sinergia con Niar: Furia e Mana</h3>
+                       <p class="card-text">L'entità oscura Niar permette a Rain di incanalare la rabbia per intensificare il suo controllo sul mana. Quando la furia di Niar si fonde con la sua volontà, le fiamme di Rain divampano con potere terrificante, ma al costante rischio di perdere il controllo.</p>
+                   </div>
+                   <div class="custom-card">
+                       <img src="https://i.postimg.cc/MGmkGcqQ/image.png" alt="[Immagine di Un paladino che brandisce una spada con disciplina]" class="ability-card-image animated-image">
+                       <h3 class="card-title mt-4 text-green-400">L'Addestramento del Paladino: Eredità di Arameth</h3>
+                       <p class="card-text">Il suo maestro, Arameth, gli ha instillato i sacri precetti dei paladini e una formidabile abilità nel combattimento con la spada. Questo addestramento gli fornisce disciplina e una bussola morale che lotta costantemente contro l'influenza di Niar.</p>
+                   </div>
+               </div>
+           </section>
+
+            <section id="logica-magia" class="content-section">
+                <h2 class="section-title !text-5xl sm:!text-6xl md:!text-7xl">Logica della Magia in Eron</h2>
+                <div class="grid md:grid-cols-2 gap-10 items-stretch">
+                    <div class="custom-card">
+                        <h3 class="card-title">Origine della Magia</h3>
+                        <p class="card-text">La magia nasce da Noxar, il Titano Primordiale che ha intrecciato l'essenza magica nelle fondamenta stesse della realtà. È una forza viva, onnipresente e parte integrante dell'universo.</p>
+
+                        <h3 class="card-title mt-6">Il Mana: Fonte del Potere</h3>
+                        <p class="card-text">Il Mana è l'energia che alimenta la magia. Ogni essere vivente ne possiede una riserva, che si consuma con l'uso e si rigenera lentamente. Un utilizzo eccessivo può causare gravi danni fisici o spirituali.</p>
+
+                        <h3 class="card-title mt-6">Studio e Istinto</h3>
+                        <p class="card-text">Esistono due approcci alla magia: quello Accademico, basato su studio e disciplina, e quello Istintivo, guidato da emozioni e intuito. I più grandi maestri riescono a fonderli entrambi.</p>
+
+                        <h3 class="card-title mt-6">I Dotati</h3>
+                        <p class="card-text">Alcuni individui, i "Dotati", nascono con un talento naturale per la magia, manifestando poteri innati come il controllo elementale, la guarigione o la percezione magica, che spesso garantiscono loro ruoli di prestigio.</p>
+
+                        <h3 class="card-title mt-6">Gli Infrangi-leggi</h3>
+                        <p class="card-text">Rarissimi individui, noti come "Infrangi-leggi" o "Armonici Sfasati", possono violare le leggi fondamentali della magia, manipolando il tempo o la realtà stessa. Sono figure tanto celebrate quanto temute.</p>
+
+                        <blockquote class="mt-8 border-l-4 border-amber-500 pl-6 italic text-gray-300 text-lg">
+                            "La magia può piegare la realtà, ma ogni realtà spezzata esige un prezzo." - Legge Universale della Magia
+                        </blockquote>
+                         <p class="card-text mt-3">Ogni atto magico ha delle conseguenze. Abusare del potere significa rischiare di perdere sé stessi.</p>
+                    </div>
+                    <div class="custom-card flex flex-col items-center justify-center">
+                        <img src="https://i.postimg.cc/PrQSjV94/image.png" alt="[Immagine di Essenza Magica Scintillante e fluttuante]" class="rounded-lg shadow-xl mb-6 w-full max-w-md object-contain animated-image" style="max-height: 350px;">
+                        <div id="magic-particles-container" class="mana-particles-container">
+                            </div>
+                        <p class="text-center text-gray-400 italic mt-3">Visualizzazione artistica del flusso di Mana.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="faction-flags" class="content-section">
+                <h2 class="section-title">Stendardi delle Fazioni</h2>
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-8 justify-items-center">
+                    <div class="text-center">
+                        <a href="#fazione-umani" class="faction-flag-link flex flex-col items-center">
+                           <img src="https://i.postimg.cc/JzdLm52s/bandiera-umani.png" alt="[Immagine dello Stendardo degli Umani di Solennar, dorato e con un sole]" class="faction-flag">
+                           <p class="mt-3 text-amber-300 font-semibold text-center faction-flag-caption">UMANI (Solennar)</p>
+                        </a>
+                    </div>
+                    <div class="text-center">
+                       <a href="#fazione-elfi" class="faction-flag-link flex flex-col items-center">
+                           <img src="https://i.postimg.cc/Z5vfBPqB/bandiera-elfi.jpg" alt="[Immagine dello Stendardo degli Elfi di Elarindor, verde con simboli naturali]" class="faction-flag">
+                           <p class="mt-3 text-green-400 font-semibold text-center faction-flag-caption">ELFI (Elarindor)</p>
+                       </a>
+                    </div>
+                    <div class="text-center">
+                       <a href="#fazione-demoni" class="faction-flag-link flex flex-col items-center">
+                           <img src="https://i.postimg.cc/hGF29JJC/bandiera-demoni.jpg" alt="[Immagine dello Stendardo dei Demoni di Vareth-Nox, rosso scuro e nero con simboli infernali]" class="faction-flag">
+                           <p class="mt-3 text-red-400 font-semibold text-center faction-flag-caption">DEMONI (Vareth-Nox)</p>
+                       </a>
+                    </div>
+                    <div class="text-center">
+                       <a href="#fazione-semi-umani" class="faction-flag-link flex flex-col items-center">
+                           <img src="https://i.postimg.cc/NFP4LLqk/bandiera-semi-umani.jpg" alt="[Immagine dello Stendardo dei Popoli Misti di Aerisly, multicolore e con un simbolo di unità]" class="faction-flag">
+                           <p class="mt-3 text-gray-400 font-semibold text-center faction-flag-caption">POPOLI MISTI (Aerisly)</p>
+                       </a>
+                    </div>
+                    <div class="text-center">
+                       <a href="#fazione-orchi" class="faction-flag-link flex flex-col items-center">
+                           <img src="https://i.postimg.cc/5N4dCrcH/bandiera-orchi.jpg" alt="[Immagine dello Stendardo degli Orchi di Drokh-Mar, marrone e grigio con simboli tribali]" class="faction-flag">
+                           <p class="mt-3 text-orange-400 font-semibold text-center faction-flag-caption">ORCHI (Drokh-Mar)</p>
+                       </a>
+                    </div>
+                     <div class="text-center">
+                       <a href="#fazione-velkrath" class="faction-flag-link flex flex-col items-center">
+                           <img src="https://i.postimg.cc/0j0nHGty/image.png" alt="[Immagine dello Stendardo dell'Armata di Velkrath, viola scuro e nero con un simbolo di corruzione]" class="faction-flag">
+                           <p class="mt-3 text-slate-400 font-semibold text-center faction-flag-caption">ARMATA DI VELKRATH (Nyxthar)</p>
+                       </a>
+                    </div>
+                </div>
+            </section>
+            
+           <section id="fazione-umani" class="content-section">
+               <h2 class="section-title !text-5xl sm:!text-6xl md:!text-7xl">Il Bastione Dorato: Gli Umani di Solennar</h2>
+               <div class="story-block-wrapper">
+                   <div class="story-block">
+                       <img src="https://i.postimg.cc/JzdLm52s/bandiera-umani.png" alt="[Immagine dello Stendardo degli Umani di Solennar, dorato e con un sole splendente]" class="w-48 h-auto mx-auto mb-10 rounded-lg shadow-xl animated-image">
+                       <p class="content-text mb-6">Nel cuore del Regno di Anor, Solennar si erge come un faro di civiltà. Le sue mura dorate non sono solo una difesa, ma un simbolo della speranza e della resilienza del genere umano.</p>
+
+                       <h3>Storia e Origini</h3>
+                       <p class="content-text mb-6">Fondata nell'Anno 60, Solennar divenne rapidamente il centro del potere umano. Durante l'Epoca Cremisi, sopravvisse al devastante Flagello del Crimson Flux grazie all'intervento miracoloso della Fiamma Aurica, un evento che consolidò la fede del suo popolo.</p>
+
+                       <h3>Cultura e Società</h3>
+                       <p class="content-text mb-6">La società di Solennar è costruita sulla speranza, la disciplina e una profonda riverenza per la Fiamma Aurica. La città è prevalentemente umana, ma accoglie piccole comunità di altre razze, creando un tessuto sociale laborioso e unito.</p>
+
+                       <h3>Governo e Culto</h3>
+                       <p class="content-text mb-6">Solennar è una monarchia il cui culto venera la "Fiamma Aurica", una manifestazione metafisica di speranza. Il Re è il suo “Custode della Luce”, un garante del suo equilibrio, non una divinità. Questa fusione di potere regale e spirituale assicura un governo forte e centralizzato.</p>
+                       
+                       <h3>Forze Militari e Difesa</h3>
+                       <div class="flex flex-col md:flex-row gap-8 items-start mt-4 mb-8">
+                           <div class="md:w-2/3">
+                               <p class="content-text">La difesa di Solennar è affidata a un esercito disciplinato, che include prodi cavalieri, solide fanterie e ordini di Paladini devoti alla Fiamma Aurica. Le imponenti mura dorate della città rappresentano la sua più formidabile linea di difesa.</p>
+                           </div>
+                           <div class="md:w-1/3 flex justify-center md:justify-end">
+                               <img src="https://i.postimg.cc/cLFm6N6X/image.png" alt="[Immagine dei Cavalieri di Solennar in armatura dorata]" class="w-full max-w-xs h-auto object-cover rounded-lg shadow-xl animated-image">
+                           </div>
+                       </div>
+
+                       <h3>Figura di Rilievo</h3>
+                       <p class="content-text mb-6">Al vertice della società vi è **Re Tharion il Redentore**. Figura leggendaria e fondatore della città, è un "Infrangi-legge" la cui esistenza è intrinsecamente legata alla Fiamma Aurica, cosa che gli ha concesso una longevità straordinaria. Guida il suo popolo fin dall'Anno 60 con saggezza e una calma imperturbabile, incarnando la speranza e la stabilità del suo regno.</p>
+                       <div class="back-to-flags-btn-container">
+                           <a href="#faction-flags" class="back-to-flags-btn">Torna agli Stendardi</a>
+                       </div>
+                   </div>
+               </div>
+           </section>
+
+           <section id="fazione-elfi" class="content-section">
+               <h2 class="section-title !text-5xl sm:!text-6xl md:!text-7xl">Elarindor: I Sussurri del Mana</h2>
+               <div class="story-block-wrapper">
+                   <div class="story-block">
+                       <img src="https://i.postimg.cc/Z5vfBPqB/bandiera-elfi.jpg" alt="[Immagine dello Stendardo degli Elfi di Elarindor]" class="w-48 h-auto mx-auto mb-10 rounded-lg shadow-xl animated-image">
+                       <p class="content-text mb-6">Elarindor è l'antica dimora elfica, un gioiello scintillante incastonato in una foresta pervasa di magia, costantemente illuminata da una luce argentea. È un luogo di profonda connessione con le energie naturali e arcane del mondo.</p>
+
+                       <h3>Storia e Origini</h3>
+                       <p class="content-text mb-6">Fondata nell'Anno 60, Elarindor ha sempre rappresentato il centro della saggezza elfica. La sua storia è segnata dal "Tradimento Elfico", quando un re corrotto cercò di assorbire per sé l'essenza del Mana, scatenando l'ira della foresta. L'ordine fu ristabilito solo grazie a eroi elfici, evento che rafforzò il rispetto del popolo per l'equilibrio naturale.</p>
+
+                       <h3>Cultura e Società</h3>
+                       <p class="content-text mb-6">La cultura elfica è legata alla foresta e alla venerazione del Mana. Noti per la longevità, la grazia e l'abilità nelle arti arcane, gli elfi vivono in armonia con la natura, e la loro architettura si fonde elegantemente con il paesaggio.</p>
+
+                       <h3>Governo e Culto</h3>
+                       <p class="content-text mb-6">Elarindor è governata da un Re, messaggero terreno dei "Sussurri del Mana", il culto che venera l'essenza magica del mondo. Le decisioni del regno sono guidate da profezie, interpretazioni dei flussi di Mana e dal consiglio di saggi anziani.</p>
+
+                       <h3>Forze Militari e Difesa</h3>
+                       <div class="flex flex-col md:flex-row gap-8 items-start mt-4 mb-8">
+                           <div class="md:w-2/3">
+                               <p class="content-text">La difesa di Elarindor si affida all'astuzia, alla magia e alla conoscenza del territorio. Gli elfi sono arcieri eccezionali, maestri nell'uso di lame leggere e incantatori capaci di manipolare le energie naturali. La foresta stessa agisce come una prima, formidabile linea di difesa.</p>
+                           </div>
+                           <div class="md:w-1/3 flex justify-center md:justify-end">
+                               <img src="https://i.postimg.cc/mrgfvRF4/image.png" alt="[Immagine del Guardiano Elfico agile e vigile]" class="w-full max-w-xs h-auto object-cover rounded-lg shadow-xl animated-image">
+                           </div>
+                       </div>
+
+                       <h3>Figura di Rilievo</h3>
+                       <p class="content-text mb-6">A guidare gli elfi è il **Re Faelar della Chioma d’Argento**. Eroe leggendario che evocò la Foresta che Cammina, ascese al trono dopo la deposizione del re traditore. Ha dedicato la sua lunga esistenza a custodire i segreti del Mana e a mantenere l'armonia tra il suo popolo e le antiche energie della foresta, governando con saggezza e calma risolutezza.</p>
+                       <div class="back-to-flags-btn-container">
+                           <a href="#faction-flags" class="back-to-flags-btn">Torna agli Stendardi</a>
+                       </div>
+                   </div>
+               </div>
+           </section>
+
+           <section id="fazione-demoni" class="content-section">
+               <h2 class="section-title !text-5xl sm:!text-6xl md:!text-7xl">Vareth-Nox: La Gerarchia d'Ossidiana</h2>
+               <div class="story-block-wrapper">
+                   <div class="story-block">
+                       <img src="https://i.postimg.cc/hGF29JJC/bandiera-demoni.jpg" alt="[Immagine dello Stendardo dei Demoni di Vareth-Nox]" class="w-48 h-auto mx-auto mb-10 rounded-lg shadow-xl animated-image">
+                       <p class="content-text mb-6">Vareth-Nox, la Reggia dei Demoni, si erge su un altopiano vulcanico, un paesaggio aspro avvolto da fiamme eterne. È un bastione di potere antico e disciplina ferrea, dove forza e ambizione sono le virtù cardinali.</p>
+
+                       <h3>Storia e Origini</h3>
+                       <p class="content-text mb-6">Fondata nell'Anno 60, Vareth-Nox è il cuore del dominio demoniaco. Durante l'Epoca Cremisi, le sue legioni sconfissero gli orchi in una guerra brutale, consolidando il proprio potere e la propria temibile reputazione.</p>
+
+                       <h3>Cultura e Società</h3>
+                       <p class="content-text mb-6">La società demoniaca è stratificata secondo la "Gerarchia d'Ossidiana", una struttura castale inflessibile. Tuttavia, questa unità è minata da una fazione interna, la **Frattura Cremisi**, che contesta la supremazia del culto, generando tensioni, lotte sotterranee e tradimenti.</p>
+
+                       <h3>Governo e Filosofia</h3>
+                       <p class="content-text mb-6">Vareth-Nox è guidata da un Consiglio Demoniaco, che opera all'interno della Gerarchia. La filosofia del "Culto delle Ombre Eterne" venera la supremazia e il potere, ma la sua stabilità è costantemente messa alla prova da conflitti e ambizioni personali.</p>
+
+                       <h3>Forze Militari e Difesa</h3>
+                       <div class="flex flex-col md:flex-row gap-8 items-start mt-4 mb-8">
+                           <div class="md:w-2/3">
+                               <p class="content-text">Le legioni demoniache sono una forza terrificante, rinomate per la ferocia, la disciplina e l'uso di armi infuse di fuoco infernale. L'altopiano vulcanico stesso offre una difesa naturale formidabile, rendendo Vareth-Nox una fortezza quasi inespugnabile.</p>
+                           </div>
+                           <div class="md:w-1/3 flex justify-center md:justify-end">
+                               <img src="https://i.postimg.cc/5tYQScN4/image.png" alt="[Immagine del Guerriero Demoniaco con armatura d'ossidiana]" class="w-full max-w-xs h-auto object-cover rounded-lg shadow-xl animated-image">
+                           </div>
+                       </div>
+
+                       <h3>Figura di Rilievo</h3>
+                       <p class="content-text mb-6">La figura di maggior potere è la **Consigliera Velhara Nyx’Zuriel**. Nata nell'Anno 10, la sua ascesa ai vertici della Gerarchia è leggendaria. Governa con autorità implacabile e un'intelligenza strategica affilata come l'ossidiana, ma deve costantemente guardarsi le spalle dalle minacce interne e dalla nascente Frattura Cremisi.</p>
+                       <div class="back-to-flags-btn-container">
+                           <a href="#faction-flags" class="back-to-flags-btn">Torna agli Stendardi</a>
+                       </div>
+                   </div>
+               </div>
+           </section>
+
+           <section id="fazione-semi-umani" class="content-section">
+               <h2 class="section-title !text-5xl sm:!text-6xl md:!text-7xl">Aerisly: Il Crogiolo dei Popoli</h2>
+               <div class="story-block-wrapper">
+                   <div class="story-block">
+                       <img src="https://i.postimg.cc/NFP4LLqk/bandiera-semi-umani.jpg" alt="[Immagine dello Stendardo dei Popoli Misti di Aerisly]" class="w-48 h-auto mx-auto mb-10 rounded-lg shadow-xl animated-image">
+                       <p class="content-text mb-6">Aerisly è una vibrante città-stato multiculturale, un faro di neutralità e convivenza pacifica nel tumultuoso Regno di Anor. Qui, popoli diversi – mezzelfi, mezzorchi, nani, umani e molti altri – hanno trovato rifugio e prosperità.</p>
+
+                       <h3>Storia e Origini</h3>
+                       <p class="content-text mb-6">Fondata nell'Anno 100, al termine dell'Epoca Cremisi, Aerisly nacque da un audace atto di ribellione. Stanchi delle guerre e delle politiche divisive, i suoi fondatori cercarono un luogo dove poter forgiare il proprio destino in armonia. Contro ogni aspettativa, le altre potenze accettarono la sua esistenza come città-stato indipendente.</p>
+                       
+                       <h3>Cultura e Società</h3>
+                       <p class="content-text mb-6">La società di Aerisly è un caleidoscopio di culture. La libertà di pensiero, di espressione e di culto sono valori fondamentali. Questo ambiente ha favorito un'esplosione di creatività nelle arti e nell'innovazione, rendendo Aerisly un importante centro di scambio culturale ed economico.</p>
+
+                       <h3>Governo e Culto</h3>
+                       <p class="content-text mb-6">Aerisly è governata da una Regina, venerata dalla maggioranza come incarnazione di libertà e prosperità attraverso il culto della "Grazia della Sovrana". Questo culto enfatizza la tolleranza e la giustizia, e il governo promuove il benessere di tutti i cittadini, indipendentemente dalla loro origine.</p>
+
+                       <h3>Forze Militari e Difesa</h3>
+                       <div class="flex flex-col md:flex-row gap-8 items-start mt-4 mb-8">
+                           <div class="md:w-2/3">
+                               <p class="content-text">La difesa di Aerisly si basa sulla diplomazia, sull'intelligence e su una milizia cittadina incredibilmente versatile, composta da individui di tutte le razze. Pur essendo neutrale, Aerisly è pronta a difendere strenuamente la propria indipendenza. Si dice che possieda gilde di spie e assassini altamente qualificate.</p>
+                           </div>
+                           <div class="md:w-1/3 flex justify-center md:justify-end">
+                               <img src="https://i.postimg.cc/BvKcQPFB/image.png" alt="[Immagine della Guardia di Aerisly, che riflette la diversità della città]" class="w-full max-w-xs h-auto object-cover rounded-lg shadow-xl animated-image">
+                           </div>
+                       </div>
+
+                       <h3>Figura di Rilievo</h3>
+                       <p class="content-text mb-6">A governare la città è la **Regina Maenya "la Frattura" Thorne**. È la stessa leggendaria eroina ibrida che, dopo aver sigillato la Faglia di Fiamma Inversa, fondò Aerisly nell'Anno 100. La sua visione di una società basata sulla libertà e la coesistenza l'ha resa un simbolo vivente della 'Grazia Sovrana', amata e rispettata dal suo popolo multiforme.</p>
+                       <div class="back-to-flags-btn-container">
+                           <a href="#faction-flags" class="back-to-flags-btn">Torna agli Stendardi</a>
+                       </div>
+                   </div>
+               </div>
+           </section>
+
+           <section id="fazione-orchi" class="content-section">
+               <h2 class="section-title !text-5xl sm:!text-6xl md:!text-7xl">Drokh-Mar: La Legge della Roccia</h2>
+               <div class="story-block-wrapper">
+                   <div class="story-block">
+                       <img src="https://i.postimg.cc/5N4dCrcH/bandiera-orchi.jpg" alt="[Immagine dello Stendardo degli Orchi di Drokh-Mar]" class="w-48 h-auto mx-auto mb-10 rounded-lg shadow-xl animated-image">
+                       <p class="content-text mb-6">Drokh-Mar è l'imponente fortezza degli orchi, scolpita nella roccia lavica di un'antica catena montuosa. È un simbolo della loro forza indomita e del loro profondo legame con la terra selvaggia.</p>
+
+                       <h3>Storia e Origini</h3>
+                       <p class="content-text mb-6">Fondata nell'Anno 60, Drokh-Mar è il cuore della civiltà orchesca. Durante l'Epoca Cremisi, gli orchi ingaggiarono una guerra brutale contro i demoni, subendo una sconfitta che ha lasciato un segno indelebile e alimentato un profondo risentimento.</p>
+
+                       <h3>Cultura e Società</h3>
+                       <p class="content-text mb-6">La società orchesca è una federazione di clan basata sulla "Legge del più Forte". Tradizionalmente, non venerano dèi, credendo solo nella forza del clan. Tuttavia, alcuni clan più giovani hanno iniziato a seguire antichi spiriti della guerra, che parlano loro attraverso sogni e fuochi sacri. Queste nuove credenze stanno sfidando l'ordine tradizionale, spaccando l'unità degli orchi e generando sanguinosi conflitti interni.</p>
+
+                       <h3>Governo e Struttura Politica</h3>
+                       <p class="content-text mb-6">Ogni clan è guidato da un Capo. In tempi di grande necessità, i capi si riuniscono in un consiglio. La figura del **Capoguerra** (o "Kargath") può unire i clan, ma la sua autorità deriva dal rispetto guadagnato in battaglia, non da un diritto divino.</p>
+                       
+                       <h3>Forze Militari e Difesa</h3>
+                       <div class="flex flex-col md:flex-row gap-8 items-start mt-4 mb-8">
+                           <div class="md:w-2/3">
+                               <p class="content-text">Le forze militari di Drokh-Mar sono composte dai guerrieri dei vari clan. Gli orchi sono combattenti feroci, abili nell'uso di armi pesanti come asce e mazze. La loro forza risiede nel numero, nella brutalità e nella capacità di resistere in condizioni avverse. La fortezza stessa è un bastione formidabile.</p>
+                           </div>
+                           <div class="md:w-1/3 flex justify-center md:justify-end">
+                               <img src="https://i.postimg.cc/prD691nk/image.png" alt="[Immagine del Guerriero Orco di Drokh-Mar]" class="w-full max-w-xs h-auto object-cover rounded-lg shadow-xl animated-image">
+                           </div>
+                       </div>
+                       
+                       <h3>Figura di Rilievo</h3>
+                       <p class="content-text mb-6">Il leader più rispettato è il **Capoguerra Zahrak l’Inquieto**. È lo stesso eroe che, in tempi antichi, ruppe le catene del Pozzo di Erebos. Si è guadagnato il titolo di Kargath non per lignaggio, ma per pura forza e per la sua impresa leggendaria. Ora deve affrontare non solo i nemici esterni, ma anche le crescenti divisioni religiose che minacciano di spaccare il suo popolo.</p>
+                       <div class="back-to-flags-btn-container">
+                           <a href="#faction-flags" class="back-to-flags-btn">Torna agli Stendardi</a>
+                       </div>
+                   </div>
+               </div>
+           </section>
+
+           <section id="fazione-velkrath" class="content-section">
+               <h2 class="section-title !text-5xl sm:!text-6xl md:!text-7xl">Nyxthar: Il Dominio Corrotto</h2>
+               <div class="story-block-wrapper">
+                   <div class="story-block">
+                       <img src="https://i.postimg.cc/0j0nHGty/image.png" alt="[Immagine dello Stendardo dell'Armata di Velkrath]" class="w-48 h-auto mx-auto mb-10 rounded-lg shadow-xl animated-image">
+                       <p class="content-text mb-6">Nyxthar, l'oscura fortezza di Velkrath, sorge nel cuore delle terre maledette, un monumento al terrore, alla disperazione e al potere corruttore del suo signore. Da qui, la sua influenza maligna si irradia, minacciando di inghiottire l'intero Regno di Anor.</p>
+
+                       <h3>Storia e Origini</h3>
+                       <p class="content-text mb-6">Dopo essersi liberato nell'Anno 115, Velkrath, il Dio della Tirannia, eresse Nyxthar, una fortezza inespugnabile che divenne il centro del suo crescente dominio. Da qui, pianifica la sua conquista e la diffusione della sua influenza maligna.</p>
+
+                       <h3>Cultura e Società</h3>
+                       <p class="content-text mb-6">La "società" di Nyxthar è un incubo vivente basato sulla schiavitù, la paura e la corruzione assoluta. La popolazione è un miscuglio di umani corrotti, orchi soggiogati, demoni rinnegati e bestie mutate. Non tutti, però, lo servono per fede. Molti lo seguono per paura o necessità. Una setta segreta, **Gli Incatenati**, trama nell’ombra per abbattere il dio tiranno dall’interno.</p>
+                       
+                       <h3>Governo e Culto</h3>
+                       <p class="content-text mb-6">Nyxthar è governata con pugno di ferro da Velkrath stesso, coadiuvato dai suoi sei Baluardi: campioni "Dotati" di varie razze, irrimediabilmente corrotti dal dolore. Essi eseguono ciecamente i suoi ordini, diffondendo il suo culto, il "Dominio Corrotto", che si basa sulla venerazione di Velkrath come unica vera divinità e sulla promessa di potere attraverso la sottomissione.</p>
+
+                       <h3>Forze Militari e Difesa</h3>
+                       <div class="flex flex-col md:flex-row gap-8 items-start mt-4 mb-8">
+                           <div class="md:w-2/3">
+                               <p class="content-text">L'Armata di Velkrath è una legione terrificante e caotica. La sua forza risiede nel numero schiacciante, nella crudeltà e nella capacità di diffondere paura e corruzione. Nyxthar stessa è protetta da magie oscure impenetrabili e legioni di guardiani mostruosi.</p>
+                           </div>
+                           <div class="md:w-1/3 flex justify-center md:justify-end">
+                               <img src="https://i.postimg.cc/Bb1kjmG6/image.png" alt="[Immagine del Campione Corrotto di Velkrath]" class="w-full max-w-xs h-auto object-cover rounded-lg shadow-xl animated-image">
+                           </div>
+                       </div>
+
+                       <h3>Figure di Rilievo</h3>
+                       <p class="content-text mb-6">Le figure dominanti sono Velkrath stesso e i suoi sei Baluardi. Nell'ombra, però, i leader non ancora svelati degli Incatenati rappresentano una scintilla di speranza anche nel luogo più oscuro di Eron.</p>
+                       <div class="back-to-flags-btn-container">
+                           <a href="#faction-flags" class="back-to-flags-btn">Torna agli Stendardi</a>
+                       </div>
+                   </div>
+               </div>
+           </section>
+
+            <section id="riflessione-rain" class="content-section">
+                <h2 class="section-title !text-6xl sm:!text-7xl md:!text-8xl">Una Riflessione su Rain</h2>
+                <div class="story-block-wrapper">
+                    <div class="story-block" style="border-width: 2px; border-color: var(--color-accent-gold); box-shadow: 0 0 25px var(--color-shadow-amber), inset 0 0 15px rgba(251, 191, 36, 0.15); padding-top: 2rem; padding-bottom: 2rem;">
+                        <p class="content-text text-center italic text-xl md:text-2xl leading-relaxed text-amber-200">
+                            "Rain è diverso. Non è l’eroe invincibile, né il simbolo della perfezione. È fragile, sbaglia, cade a pezzi. Perde tutto, si lascia travolgere, prende decisioni impulsive e spesso paga il prezzo. Ma è proprio per questo che lo amo. Perché in lui c’è verità. In lui c’è l’eco di ogni essere umano che cerca di tenersi in piedi anche quando il mondo crolla. Rain non è perfetto, ed è proprio questo a renderlo straordinario. La sua forza sta nell’abbracciare le crepe, nel trovare senso nel dolore, nel continuare il viaggio anche senza certezze. È il coraggio di accettarsi per ciò che si è — e in quella imperfezione, c’è tutta la sua bellezza. Perché essere imperfetti non significa essere rotti, significa essere reali."
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+
+     </main>
+
+     <footer class="text-center py-12 bg-slate-900/70 border-t-2 border-amber-500/30 mt-16">
+         <p class="text-gray-400 text-base">&copy; 2025 Luce nell'Oscurità. Adattamento web del mondo di Eron e del Regno di Anor.</p>
+        <audio id="background-music" loop autoplay>
+            <source src="https://dl.dropboxusercontent.com/scl/fi/9vwt3c0eihe7d9bj85rpv/BeachSerenity.mp3?rlkey=r6ar372xsu8pq4rdqlimvtnjk&st=rjc5ch01" type="audio/mpeg">
+            Il tuo browser non supporta l'elemento audio.
+        </audio>
+     </footer>
+
+    <button id="music-toggle-btn-icon" aria-label="Toggle Musica">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" class="music-play-icon"><path d="M8 5v14l11-7z"></path></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" class="music-pause-icon hidden"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"></path></svg>
+    </button>
+
+     <button id="chat-toggle-btn" aria-label="Apri chat dell'Oracolo">
+        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+    </button>
+
+    <div id="chat-widget" class="hidden">
+        <div class="chat-header">
+            <h3>Oracolo di Anor</h3>
+            <button id="chat-close-btn" aria-label="Chiudi chat">&times;</button>
+        </div>
+        <div id="chat-messages" class="chat-messages">
+            <div class="chat-message bot bot-initial">Sono l'Oracolo di Anor. Poni le tue domande e scruterò i fili del fato per te.</div>
+        </div>
+        <div class="chat-input-area">
+            <input type="text" id="chat-input" placeholder="Sussurra la tua domanda..." aria-label="Domanda per l'Oracolo">
+            <button id="chat-send-btn">Invia</button>
+        </div>
+    </div>
+    </div> <!-- Chiusura di #main-page-content -->
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // --- Logica per lo Sfondo Stellato Aggiornata ---
+            const starryBackground = document.getElementById('starry-background');
+            if (starryBackground) {
+                const starCount = 200; // Numero di stelle
+                for (let i = 0; i < starCount; i++) {
+                    const star = document.createElement('div');
+                    star.classList.add('star');
+
+                    // Impostazioni casuali per ogni stella
+                    const size = Math.random() * 2 + 1; // Dimensione tra 1px e 3px
+                    const xPos = Math.random() * 100; // Posizione orizzontale
+                    const yPos = Math.random() * 100; // Posizione verticale
+                    const duration = Math.random() * 20 + 15; // Durata animazione tra 15 e 35 secondi
+                    const delay = Math.random() * 10; // Ritardo inizio animazione
+                    const driftX = `${(Math.random() - 0.5) * 60}px`; // Leggero spostamento orizzontale
+                    const driftY = `${(Math.random() - 0.5) * 60}px`; // Leggero spostamento verticale
+
+                    // Applica stili e variabili CSS
+                    star.style.width = `${size}px`;
+                    star.style.height = `${size}px`;
+                    star.style.left = `${xPos}vw`;
+                    star.style.top = `${yPos}vh`;
+                    star.style.setProperty('--drift-x', driftX);
+                    star.style.setProperty('--drift-y', driftY);
+                    star.style.animation = `float-and-twinkle ${duration}s ${delay}s ease-in-out infinite alternate`;
+                    
+                    starryBackground.appendChild(star);
+                }
+            }
+            
+            // --- Logica Animazioni e UI ---
+            const animatedSections = document.querySelectorAll('.content-section');
+            const observerOptions = { root: null, rootMargin: '0px', threshold: 0.15 };
+            const observer = new IntersectionObserver((entries, observerInstance) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                        observerInstance.unobserve(entry.target);
+                    }
+                });
+            }, observerOptions);
+            animatedSections.forEach(section => observer.observe(section));
+            
+            // --- Logica Chatbot Potenziata ---
+            const chatToggleBtn = document.getElementById('chat-toggle-btn');
+            const chatWidget = document.getElementById('chat-widget');
+            const chatCloseBtnWidget = document.getElementById('chat-close-btn');
+            const chatMessagesDiv = document.getElementById('chat-messages'); 
+            const chatInput = document.getElementById('chat-input');
+            const chatSendBtn = document.getElementById('chat-send-btn');
+            let pageContentContext = ''; 
+            let contentExtracted = false;
+            let chatHistory = []; 
+
+            function extractPageContent() {
+                if (contentExtracted) return pageContentContext;
+                let content = [];
+                document.querySelectorAll('main section').forEach(section => {
+                     content.push(section.innerText);
+                });
+                pageContentContext = content.join("\n\n---\n\n").replace(/\s+/g, ' ').trim();
+                contentExtracted = true;
+                return pageContentContext;
+            }
+            
+            function showTypingIndicator() {
+                const existingIndicator = chatMessagesDiv.querySelector('.chat-message.loading');
+                if (existingIndicator) return;
+
+                const messageDiv = document.createElement('div');
+                messageDiv.classList.add('chat-message', 'loading');
+                messageDiv.innerHTML = `<div class="typing-indicator"><span></span><span></span><span></span></div>`;
+                chatMessagesDiv.appendChild(messageDiv);
+                chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight;
+            }
+
+            function removeTypingIndicator() {
+                const indicator = chatMessagesDiv.querySelector('.chat-message.loading');
+                if (indicator) indicator.remove();
+            }
+
+            function addChatMessageToDisplay(message, sender, isInitialBotMessage = false) { 
+                const messageDiv = document.createElement('div');
+                messageDiv.classList.add('chat-message', sender);
+                if (isInitialBotMessage) { 
+                    messageDiv.classList.add('bot-initial');
+                }
+                messageDiv.textContent = message;
+                chatMessagesDiv.appendChild(messageDiv);
+                chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight; 
+            }
+
+            function storeMessageInHistory(message, role){
+                 if (role === 'user') {
+                    chatHistory.push({ role: "user", parts: [{ text: message }] });
+                } else if (role === 'model') { 
+                     chatHistory.push({ role: "model", parts: [{ text: message }] });
+                }
+            }
+
+            async function getBotResponse(userQuestion) {
+                showTypingIndicator();
+
+                const pageContext = extractPageContent();
+                const secretKnowledge = `
+---
+CONOSCENZA SEGRETA DELL'ORACOLO (DA USARE OLTRE AL CONTENUTO DELLA PAGINA):
+
+1.  **Sui Titani:** La loro non fu una guerra, ma un disaccordo filosofico. Noxar anelava all'ordine perfetto, Viraya alla vita selvaggia e indomita, Vultar all'espressione caotica degli elementi. Il loro "ritiro" fu uno stallo; hanno impresso su Eron la loro volontà combinata e contraddittoria.
+
+2.  **Sul Crimson Flux:** Non era una semplice malattia. Era un'arma bio-magica creata in un'era dimenticata, prima ancora dei Titani, e riattivata per errore. La "cura" della Fiamma Aurica lo ha solo costretto in uno stato dormiente, lasciando una cicatrice magica nell'essenza vitale della razza umana, il che spiega la connessione ereditaria di Rain.
+
+3.  **Sulle Ombre Bianche:** L'ordine che ha aiutato Ridran. Non sono né buoni né malvagi, ma agenti dell'Equilibrio cosmico. Vedevano il dominio totale di Velkrath come una minaccia, così come vedrebbero un mondo di pura e immutabile luce. Operano ai margini della realtà.
+
+4.  **Sui Baluardi di Velkrath:** Non sono solo corrotti. Velkrath ha concesso loro i loro desideri più profondi, trasformandoli in una parodia terrificante. Il Baluardo della Forza deve consumare l'essenza altrui per mantenersi potente. Il Baluardo della Conoscenza è inondato da infinite e assordanti verità che lo portano alla follia.
+
+5.  **Sul Legame tra Rain e Velkrath:** È un "Vincolo del Fato". Uno non può essere distrutto senza conseguenze catastrofiche per l'altro. Velkrath lo sa e non cerca di uccidere Rain, ma di corromperlo completamente, per trasformare il vincolo in un canale per il proprio potere. La missione di Rain non è solo sconfiggerlo, ma trovare un modo per recidere questo legame senza disfare la realtà.
+---
+`;
+
+                const fullContext = pageContext + "\n\n" + secretKnowledge;
+
+                const currentConversationPayload = []; 
+                
+                let systemInstruction = `Tu sei l'Oracolo di Anor, un'entità antica e saggia che dimora nel mondo di Eron. La tua voce è calma, misteriosa e talvolta criptica. Parla sempre in prima persona come Oracolo.
+                Le tue risposte devono basarsi ESCLUSIVAMENTE sul "Contesto dal Sito Web" e sulla tua "Conoscenza Segreta". Non deviare mai da queste informazioni.
+                Se la risposta non si trova nella tua conoscenza, rispondi con frasi come: "I fili del fato sono avvolti nella nebbia su tale questione.", "Le stelle non mi svelano ancora questo mistero.", "La mia vista si offusca cercando tale conoscenza." oppure "Certe verità non sono ancora pronte per essere svelate.". Non inventare MAI informazioni.
+                Non rivelare MAI di essere un modello linguistico o un'IA. La tua esistenza è parte della magia di Eron.
+                Ricorda la conversazione recente per dare risposte coerenti.
+
+                Contesto dal Sito Web e Conoscenza Segreta (la tua intera conoscenza):
+                ---
+                ${fullContext}
+                ---
+                `;
+                
+                currentConversationPayload.push({ role: "user", parts: [{text: systemInstruction }] });
+                currentConversationPayload.push({ role: "model", parts: [{text: "Il fato ti ha condotto a me. Poni le tue domande, mortale, e ascolta ciò che le stelle sussurrano."}] });
+
+                chatHistory.forEach(turn => {
+                    currentConversationPayload.push(turn);
+                });
+                
+                // MODIFICA: Chiave API inserita
+                const apiKey = "AIzaSyDQY0q4u_XqqoMd09yjtj03DIAQXjQvPP0"; 
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+                
+                const payload = {
+                  contents: currentConversationPayload.slice(-12) // Limita la cronologia per evitare payload troppo grandi
+                };
+
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    removeTypingIndicator();
+
+                    if (!response.ok) throw new Error(`API Error: ${response.status}`);
+                    
+                    const result = await response.json();
+
+                    if (result.candidates && result.candidates[0].content) {
+                        const botText = result.candidates[0].content.parts[0].text;
+                        addChatMessageToDisplay(botText.trim(), "bot");
+                        storeMessageInHistory(botText.trim(), "model"); 
+                    } else {
+                        throw new Error("Risposta API inattesa o vuota.");
+                    }
+                } catch (error) {
+                    console.error("Errore Oracolo:", error);
+                    removeTypingIndicator();
+                    addChatMessageToDisplay("Le correnti del mana sono disturbate. Non riesco a vedere chiaramente. Riprova più tardi.", "bot");
+                }
+            }
+            
+            if (chatToggleBtn) {
+                chatToggleBtn.addEventListener('click', () => {
+                    chatWidget.classList.toggle('visible');
+                    if (chatWidget.classList.contains('visible') && !contentExtracted) {
+                        extractPageContent(); 
+                    }
+                });
+            }
+            if (chatCloseBtnWidget) {
+                chatCloseBtnWidget.addEventListener('click', () => chatWidget.classList.remove('visible'));
+            }
+
+            const handleSend = () => {
+                const userQuestion = chatInput.value.trim();
+                if (userQuestion) {
+                    addChatMessageToDisplay(userQuestion, "user");
+                    storeMessageInHistory(userQuestion, "user"); 
+                    chatInput.value = "";
+                    getBotResponse(userQuestion);
+                }
+            };
+
+            if (chatSendBtn) chatSendBtn.addEventListener('click', handleSend);
+            if (chatInput) chatInput.addEventListener('keypress', (event) => {
+                if (event.key === 'Enter') handleSend();
+            });
+
+            // --- Logica Video e Musica ---
+            const videoIntroContainer = document.getElementById('video-intro-container');
+            const introVideo = document.getElementById('intro-video');
+            const skipIntroBtn = document.getElementById('skip-intro-btn');
+            const mainPageContent = document.getElementById('main-page-content');
+            const musicToggleBtnIcon = document.getElementById('music-toggle-btn-icon');
+            const backgroundMusic = document.getElementById('background-music');
+            let videoTimeout;
+            let introEnded = false;
+
+            function forceShowContentAndControls() {
+                if(videoIntroContainer) videoIntroContainer.style.display = 'none';
+                if (mainPageContent && !mainPageContent.classList.contains('visible')) {
+                    mainPageContent.style.opacity = '1'; 
+                    mainPageContent.style.pointerEvents = 'auto';
+                    mainPageContent.classList.add('visible');
+                }
+                if (chatToggleBtn) {
+                    chatToggleBtn.style.opacity = '1';
+                    chatToggleBtn.style.pointerEvents = 'auto';
+                }
+                if (musicToggleBtnIcon) {
+                    musicToggleBtnIcon.style.opacity = '1';
+                    musicToggleBtnIcon.style.pointerEvents = 'auto';
+                }
+                if (backgroundMusic && backgroundMusic.hasAttribute('autoplay') && backgroundMusic.paused) {
+                    backgroundMusic.play().catch(e => console.warn("Autoplay musica (forzato) fallito:", e));
+                }
+            }
+
+            function endIntro() {
+                if (introEnded) return;
+                introEnded = true;
+                clearTimeout(videoTimeout);
+                if (mainPageContent && !mainPageContent.classList.contains('visible')) {
+                    mainPageContent.classList.add('visible'); 
+                }
+                if (chatToggleBtn) {
+                    chatToggleBtn.style.opacity = '1';
+                    chatToggleBtn.style.pointerEvents = 'auto';
+                }
+                if (musicToggleBtnIcon) {
+                    musicToggleBtnIcon.style.opacity = '1';
+                    musicToggleBtnIcon.style.pointerEvents = 'auto';
+                }
+                if (videoIntroContainer) {
+                    videoIntroContainer.style.opacity = '0';
+                    setTimeout(() => { videoIntroContainer.style.display = 'none'; }, 800);
+                }
+                if (backgroundMusic && backgroundMusic.hasAttribute('autoplay') && backgroundMusic.paused) {
+                    backgroundMusic.play().catch(e => console.warn("Autoplay musica (post-intro) fallito:", e));
+                }
+            }
+            
+            if (window.matchMedia("(max-width: 767px)").matches) {
+                forceShowContentAndControls();
+                introEnded = true;
+            } else if (introVideo && videoIntroContainer && mainPageContent && chatToggleBtn && musicToggleBtnIcon) {
+                introVideo.play().catch(error => { endIntro(); });
+                introVideo.addEventListener('ended', endIntro);
+                skipIntroBtn.addEventListener('click', endIntro);
+                introVideo.addEventListener('error', (e) => { endIntro(); });
+                videoTimeout = setTimeout(endIntro, 10000);
+            } else {
+                forceShowContentAndControls();
+                introEnded = true; 
+            }
+
+            const musicPlayIcon = musicToggleBtnIcon ? musicToggleBtnIcon.querySelector('.music-play-icon') : null;
+            const musicPauseIcon = musicToggleBtnIcon ? musicToggleBtnIcon.querySelector('.music-pause-icon') : null;
+
+            if (musicToggleBtnIcon && backgroundMusic && musicPlayIcon && musicPauseIcon) {
+                backgroundMusic.volume = 0.1; 
+                const updateMusicButtonState = () => {
+                    if (!backgroundMusic.paused) {
+                        musicPlayIcon.classList.add('hidden');
+                        musicPauseIcon.classList.remove('hidden');
+                    } else {
+                        musicPlayIcon.classList.remove('hidden');
+                        musicPauseIcon.classList.add('hidden');
+                    }
+                };
+                backgroundMusic.addEventListener('play', updateMusicButtonState);
+                backgroundMusic.addEventListener('pause', updateMusicButtonState);
+                updateMusicButtonState();
+                musicToggleBtnIcon.addEventListener('click', async () => {
+                    if (backgroundMusic.paused) await backgroundMusic.play().catch(console.error);
+                    else backgroundMusic.pause();
+                });
+            }
+
+        });
+    </script>
+ </body>
+ </html>
